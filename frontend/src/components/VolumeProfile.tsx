@@ -195,7 +195,8 @@ export const VolumeProfile = memo(function VolumeProfile({
       
       setCurrentPrice(trade.price);
       
-      if (calculatorRef.current) {
+      // Liquidations are already in the tape
+      if (calculatorRef.current && !trade.isLiquidation) {
         calculatorRef.current.addTrade(
           trade.price,
           trade.volume,

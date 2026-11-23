@@ -6,6 +6,7 @@ services:
     environment:
       - FRONTEND_URL=http://localhost
       - PORT=3001
+      - HOST=0.0.0.0
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "wget", "-q", "--spider", "http://localhost:3001/health"]

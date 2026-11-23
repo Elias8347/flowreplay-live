@@ -1,5 +1,9 @@
 # TapeFlow
 
+> **FlowReplay Live** is an early, read-only fork of [TapeFlow](https://github.com/ianfigueroa/TapeFlow) by Ian Figueroa, used under the MIT License.
+> It replaces the spot Binance feed with the MyFundedPerps market stream, removes repeated trades, uses perpetual chart and book data, opens the footprint and CVD with the last 30 minutes of rebuilt trades, and refuses to show order flow on the 7 MFP markets with no public trade tape. It currently supports the 96 Binance-sourced MFP markets. Account overlays, trade replay and Hyperliquid markets are planned.
+> Set `MFP_API_KEY` in `backend/.env` to a read-only key when MFP starts requiring one. Not affiliated with or endorsed by MyFundedPerps. Not trading advice.
+
 ![TapeFlow v2](./docs/tapeflow_v2.png)
 
 A trading terminal for reading order flow on crypto markets. It shows the tape, footprint charts, a DOM ladder, CVD, volume profile, open interest and liquidations, flags whale trades and spoofing, and lets you paper trade against live prices. It can run against live Binance data or against a local C++ matching engine that simulates a market, and the UI does not care which one it is talking to.

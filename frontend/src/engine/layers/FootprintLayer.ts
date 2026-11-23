@@ -4,6 +4,7 @@ import type { EngineData, FootprintCluster } from '../types';
 
 const MAX_CLUSTERS = 30; // Fewer clusters for better visibility
 const DEFAULT_INTERVAL_MS = 15000; // 15 seconds for faster cluster formation
+const MIN_CANDLE_WIDTH = 70;
 
 export class FootprintLayer implements Layer {
   readonly id = 'footprint';
@@ -27,6 +28,10 @@ export class FootprintLayer implements Layer {
   
   // Track last seen price for auto tick size
   private lastPrice: number = 0;
+
+  // Number of candles scrolled back from the newest candle
+  private scrollOffset: number = 0;
+  private maxScroll: number = 0;
 
   update(data: EngineData): void {
     // Queue all trades for batch processing
@@ -197,13 +202,20 @@ export class FootprintLayer implements Layer {
       return;
     }
 
-    const allClusters = [...this.clusters];
+    const loadedClusters = [...this.clusters];
     if (this.currentCluster) {
       this.finalizePoc(this.currentCluster);
-      allClusters.push(this.currentCluster);
+      loadedClusters.push(this.currentCluster);
     }
 
-    if (allClusters.length === 0) return;
+    if (loadedClusters.length === 0) return;
+
+    // Show the newest candles that fit. Older ones are reached by scrolling.
+    const maxVisible = Math.max(1, Math.floor(chartWidth / MIN_CANDLE_WIDTH));
+    this.maxScroll = Math.max(0, loadedClusters.length - maxVisible);
+    this.scrollOffset = Math.min(this.scrollOffset, this.maxScroll);
+    const visibleEnd = loadedClusters.length - this.scrollOffset;
+    const allClusters = loadedClusters.slice(Math.max(0, visibleEnd - maxVisible), visibleEnd);
 
     let priceMin = Infinity;
     let priceMax = -Infinity;
@@ -223,7 +235,7 @@ export class FootprintLayer implements Layer {
 
     // Calculate optimal candle width based on number of clusters
     // Good widths for readability
-    const minCandleWidth = 70;
+    const minCandleWidth = MIN_CANDLE_WIDTH;
     const maxCandleWidth = 120;
     const idealWidth = Math.floor(chartWidth / Math.max(allClusters.length, 1));
     const candleWidth = Math.max(minCandleWidth, Math.min(idealWidth, maxCandleWidth));
@@ -568,6 +580,13 @@ export class FootprintLayer implements Layer {
     this.recentMaxVolumes = [];
     this.pendingTrades = [];
     this.lastPrice = 0;
+    this.scrollOffset = 0;
+    this.maxScroll = 0;
+  }
+
+  /** Positive values move toward older candles. */
+  scrollBy(candles: number): void {
+    this.scrollOffset = Math.max(0, Math.min(this.scrollOffset + candles, this.maxScroll));
   }
 
   dispose(): void {

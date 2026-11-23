@@ -170,9 +170,9 @@ export function ChartPanel({ trades: externalTrades, symbol, width = 600, classN
     
     const fetchKlines = async () => {
       try {
-        // Fetch 200 candles of history from Binance
+        // Fetch 200 perpetual candles through the local backend
         const response = await fetch(
-          `https://api.binance.com/api/v3/klines?symbol=${symbol.toUpperCase()}&interval=${binanceInterval}&limit=200`
+          `/api/binance/klines?symbol=${symbol.toUpperCase()}&interval=${binanceInterval}&limit=200`
         );
         
         if (!response.ok) {

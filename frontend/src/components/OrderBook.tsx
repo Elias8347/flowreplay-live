@@ -17,9 +17,8 @@ const DATA_POLL_INTERVAL_MS = 33; // Match poll rate to render rate to prevent v
 // Rolling window for smoothed maxSize calculation (prevents heatmap flickering)
 const MAX_SIZE_HISTORY_LENGTH = 10;
 
-// Binance API for initial snapshot
-const BINANCE_SPOT_API = 'https://api.binance.com/api/v3';
-const BINANCE_FUTURES_API = 'https://fapi.binance.com/fapi/v1';
+// Local backend proxy for the initial perpetual book snapshot
+const DEPTH_API = '/api/binance/depth';
 
 // Hydration states
 type HydrationState = 'idle' | 'fetching-snapshot' | 'buffering' | 'live';
@@ -35,25 +34,8 @@ async function fetchOrderBookSnapshot(
 ): Promise<OrderBookType | null> {
   try {
     const normalizedSymbol = symbol.toUpperCase().replace('/', '').replace('-', '');
-    
-    // Detect if futures based on symbol naming
-    const isFutures = normalizedSymbol.includes('PERP') || 
-                       normalizedSymbol.endsWith('USD') ||
-                       !normalizedSymbol.endsWith('USDT') && normalizedSymbol.length > 6;
-    
-    const baseUrl = isFutures ? BINANCE_FUTURES_API : BINANCE_SPOT_API;
-    const endpoint = `${baseUrl}/depth?symbol=${normalizedSymbol}&limit=${limit}`;
-    
-    const response = await fetch(endpoint);
+    const response = await fetch(`${DEPTH_API}?symbol=${normalizedSymbol}&limit=${limit}`);
     if (!response.ok) {
-      // Fallback to spot if futures fails
-      if (isFutures) {
-        const spotResponse = await fetch(`${BINANCE_SPOT_API}/depth?symbol=${normalizedSymbol}&limit=${limit}`);
-        if (spotResponse.ok) {
-          const data = await spotResponse.json();
-          return transformBinanceOrderBook(data, symbol, assetType);
-        }
-      }
       throw new Error(`HTTP ${response.status}`);
     }
     

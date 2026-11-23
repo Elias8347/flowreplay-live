@@ -6,14 +6,7 @@ import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { cn } from '../lib/utils';
 import { useMarketStore } from '../stores/useMarketStore';
 import { useTheme } from '../hooks/useTheme';
-
-// Popular trading pairs
-const POPULAR_SYMBOLS = [
-  'BTCUSDT', 'ETHUSDT', 'SOLUSDT', 'BNBUSDT',
-  'XRPUSDT', 'ADAUSDT', 'DOGEUSDT', 'AVAXUSDT',
-  'DOTUSDT', 'MATICUSDT', 'LINKUSDT', 'LTCUSDT',
-  'ATOMUSDT', 'UNIUSDT', 'NEARUSDT', 'APTUSDT',
-];
+import { useMfpSymbols } from '../hooks/useMfpSymbols';
 
 // Icons
 const ChevronDownIcon = () => (
@@ -47,6 +40,7 @@ export function QuickSymbolSelector({ className }: QuickSymbolSelectorProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   
   const { isHacker } = useTheme();
+  const marketSymbols = useMfpSymbols();
   
   const selectedSymbol = useMarketStore((state) => state.selectedSymbol);
   const activeSymbols = useMarketStore((state) => state.activeSymbols);
@@ -62,14 +56,14 @@ export function QuickSymbolSelector({ className }: QuickSymbolSelectorProps) {
     if (!query) {
       // Show active symbols first, then popular
       const active = activeSymbols.filter(s => s !== selectedSymbol);
-      const popular = POPULAR_SYMBOLS.filter(s => !activeSymbols.includes(s));
+      const popular = marketSymbols.filter(s => !activeSymbols.includes(s));
       return [...active, ...popular];
     }
     
     // Filter by query
-    const allSymbols = [...new Set([...activeSymbols, ...POPULAR_SYMBOLS])];
+    const allSymbols = [...new Set([...activeSymbols, ...marketSymbols])];
     return allSymbols.filter(s => s.includes(query));
-  }, [searchQuery, activeSymbols, selectedSymbol]);
+  }, [searchQuery, activeSymbols, selectedSymbol, marketSymbols]);
   
   // Handle symbol selection
   const handleSelectSymbol = useCallback((symbol: string) => {

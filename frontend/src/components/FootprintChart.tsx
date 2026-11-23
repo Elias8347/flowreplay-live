@@ -2,6 +2,7 @@ import { useRef, useEffect, useCallback, useState } from 'react';
 import { CanvasEngine, type CanvasEngineHandle, LAYER_Z } from '../engine';
 import { BackgroundLayer, FootprintLayer } from '../engine/layers';
 import { subscribeToTrades } from '../services/dataBuffer';
+import { fetchTapeHistory, mergeTape, RecentTradeIds, type HistoryStatus } from '../services/tapeHistory';
 import type { TradeWithAnalytics, Trade } from '../types';
 
 // Convert basic Trade to TradeWithAnalytics with minimal defaults
@@ -39,6 +40,9 @@ export function FootprintChart({
   const [isReady, setIsReady] = useState(false);
   const [dimensions, setDimensions] = useState({ width: 400, height: 200 });
   const pendingTradesRef = useRef<Trade[]>([]);
+  const hydratingRef = useRef(true);
+  const seenIdsRef = useRef(new RecentTradeIds());
+  const [historyStatus, setHistoryStatus] = useState<HistoryStatus>({ state: 'loading' });
 
   // ResizeObserver to fill container
   useEffect(() => {
@@ -98,6 +102,57 @@ export function FootprintChart({
     }
   }, [symbol]);
 
+  // Load the rebuilt tape, then join it to any live trades held while it loaded
+  useEffect(() => {
+    const engine = engineRef.current;
+    const layer = footprintLayerRef.current;
+    if (!isReady || !symbol || !engine || !layer) return;
+
+    const controller = new AbortController();
+    const seen = new RecentTradeIds();
+    seenIdsRef.current = seen;
+    hydratingRef.current = true;
+    setHistoryStatus({ state: 'loading' });
+
+    const release = (history: Trade[]) => {
+      const live = pendingTradesRef.current;
+      pendingTradesRef.current = [];
+      const merged = mergeTape(history, live, seen);
+      layer.clear();
+      if (merged.length > 0) {
+        engine.updateData({
+          trades: merged.map(toTradeWithAnalytics),
+          orderBook: null,
+          vwap: 0,
+          cvd: 0,
+          liquidityZones: [],
+        });
+        layer.flush();
+      }
+      hydratingRef.current = false;
+    };
+
+    fetchTapeHistory(symbol, controller.signal)
+      .then((history) => {
+        if (controller.signal.aborted) return;
+        release(history.trades);
+        setHistoryStatus({
+          state: 'ready',
+          trades: history.trades.length,
+          minutes: Math.max(1, Math.round((history.to - history.from) / 60000)),
+          complete: history.complete,
+        });
+      })
+      .catch((error) => {
+        if (controller.signal.aborted) return;
+        console.warn('[FootprintChart] History unavailable:', error);
+        release([]);
+        setHistoryStatus({ state: 'unavailable' });
+      });
+
+    return () => controller.abort();
+  }, [symbol, isReady, clusterIntervalMs]);
+
   // Subscribe to live trade stream using the listener pattern
   // This doesn't consume the buffer - it receives a copy of each trade
   useEffect(() => {
@@ -121,10 +176,14 @@ export function FootprintChart({
     if (!engine) return;
 
     const intervalId = setInterval(() => {
-      if (pendingTradesRef.current.length === 0) return;
+      if (hydratingRef.current || pendingTradesRef.current.length === 0) return;
       
-      const tradesToProcess = pendingTradesRef.current;
+      // Liquidations are already in the tape, and reconnects can repeat recent trades
+      const tradesToProcess = pendingTradesRef.current.filter(
+        (trade) => !trade.isLiquidation && seenIdsRef.current.add(trade.id)
+      );
       pendingTradesRef.current = [];
+      if (tradesToProcess.length === 0) return;
 
       engine.updateData({
         trades: tradesToProcess.map(toTradeWithAnalytics),
@@ -162,13 +221,27 @@ export function FootprintChart({
     lastTradeIndexRef.current = externalTrades.length;
   }, [externalTrades, isReady, symbol]);
 
+  const historyLabel = historyStatus.state === 'loading'
+    ? 'Rebuilding tape...'
+    : historyStatus.state === 'unavailable'
+      ? 'History unavailable, live only'
+      : `${historyStatus.complete ? 'Rebuilt' : 'Partial history'} ${historyStatus.minutes}m · ${historyStatus.trades.toLocaleString()} trades · scroll for older`;
+
   return (
-    <div ref={containerRef} className={`w-full h-full ${className || ''}`} style={{ minHeight: 100 }}>
+    <div
+      ref={containerRef}
+      className={`relative w-full h-full ${className || ''}`}
+      style={{ minHeight: 100 }}
+      onWheel={(event) => footprintLayerRef.current?.scrollBy(event.deltaY > 0 ? 1 : -1)}
+    >
       <CanvasEngine
         width={dimensions.width}
         height={dimensions.height}
         onReady={handleReady}
       />
+      <div className="pointer-events-none absolute right-2 top-1 rounded bg-black/70 px-1.5 py-0.5 font-mono text-[10px] text-gray-300">
+        {historyLabel}
+      </div>
     </div>
   );
 }

@@ -8,6 +8,7 @@
 import { useState, useEffect, useRef, memo, useMemo, useCallback } from 'react';
 import { cn } from '../lib/utils';
 import { subscribeToTrades } from '../services/dataBuffer';
+import { fetchTapeHistory, mergeTape, RecentTradeIds } from '../services/tapeHistory';
 import { LabelWithTooltip } from './Tooltip';
 import type { Trade } from '../types';
 
@@ -84,10 +85,12 @@ export const CVDOverlay = memo(function CVDOverlay({
   // Subscribe to trades
   useEffect(() => {
     const upperSymbol = symbol.toUpperCase();
-    
-    const unsubscribe = subscribeToTrades((trade: Trade) => {
-      if (trade.symbol.toUpperCase() !== upperSymbol) return;
-      
+    const controller = new AbortController();
+    const seen = new RecentTradeIds();
+    const held: Trade[] = [];
+    let hydrating = true;
+
+    const applyTrade = (trade: Trade) => {
       const delta = trade.side === 'buy' ? trade.volume : -trade.volume;
       cvdRef.current += delta;
       lastPriceRef.current = trade.price;
@@ -100,10 +103,75 @@ export const CVDOverlay = memo(function CVDOverlay({
         batchRef.current.sell += trade.volume * trade.price;
       }
       batchRef.current.price = trade.price;
+    };
+
+    const unsubscribe = subscribeToTrades((trade: Trade) => {
+      // Liquidations are already in the tape
+      if (trade.symbol.toUpperCase() !== upperSymbol || trade.isLiquidation) return;
+      if (hydrating) {
+        held.push(trade);
+      } else if (seen.add(trade.id)) {
+        applyTrade(trade);
+      }
     });
 
-    return () => unsubscribe();
-  }, [symbol]);
+    fetchTapeHistory(upperSymbol, controller.signal)
+      .then((history) => {
+        if (controller.signal.aborted) return;
+        const merged = mergeTape(history.trades, held.splice(0), seen);
+        hydrating = false;
+        if (merged.length === 0) return;
+
+        const first = merged[0].timestamp;
+        const last = merged[merged.length - 1].timestamp;
+        const bucketMs = Math.max(1000, Math.ceil((last - first + 1) / Math.floor(maxPoints * 0.75)));
+        const points: CVDDataPoint[] = [];
+        let cvd = 0, buy = 0, sell = 0, high = 0, low = 0, bucketBuy = 0, bucketSell = 0;
+        let bucket = Math.floor(first / bucketMs);
+
+        merged.forEach((trade, index) => {
+          const notional = trade.volume * trade.price;
+          if (trade.side === 'buy') {
+            cvd += trade.volume;
+            buy += notional;
+            bucketBuy += notional;
+          } else {
+            cvd -= trade.volume;
+            sell += notional;
+            bucketSell += notional;
+          }
+          high = Math.max(high, cvd);
+          low = Math.min(low, cvd);
+          const next = merged[index + 1];
+          if (!next || Math.floor(next.timestamp / bucketMs) !== bucket) {
+            points.push({ timestamp: trade.timestamp, cvd, price: trade.price, buyVolume: bucketBuy, sellVolume: bucketSell });
+            bucketBuy = 0;
+            bucketSell = 0;
+            if (next) bucket = Math.floor(next.timestamp / bucketMs);
+          }
+        });
+
+        const lastPrice = merged[merged.length - 1].price;
+        cvdRef.current = cvd;
+        buyVolRef.current = buy;
+        sellVolRef.current = sell;
+        lastPriceRef.current = lastPrice;
+        batchRef.current = { buy: 0, sell: 0, price: lastPrice };
+        setDataPoints(points);
+        setStats({ current: cvd, high, low, buyVol: buy, sellVol: sell });
+      })
+      .catch((error) => {
+        if (controller.signal.aborted) return;
+        console.warn('[CVD] History unavailable:', error);
+        hydrating = false;
+        for (const trade of held.splice(0)) if (seen.add(trade.id)) applyTrade(trade);
+      });
+
+    return () => {
+      controller.abort();
+      unsubscribe();
+    };
+  }, [symbol, maxPoints]);
 
   // Batch updates at 500ms interval
   useEffect(() => {
@@ -120,8 +188,9 @@ export const CVDOverlay = memo(function CVDOverlay({
       
       setDataPoints(prev => {
         const next = [...prev, newPoint];
-        if (next.length > maxPoints) next.shift();
-        return next;
+        // Thin the series instead of dropping its start, so history stays visible
+        if (next.length <= maxPoints) return next;
+        return next.filter((_, index) => index % 2 === 0 || index === next.length - 1);
       });
       
       setStats({

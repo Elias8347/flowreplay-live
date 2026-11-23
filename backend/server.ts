@@ -1,11 +1,12 @@
-// WebSocket server - bridges Binance streams to frontend clients
+// WebSocket server - bridges MyFundedPerps market streams to frontend clients
 
 import express from 'express';
 import http from 'http';
 import { WebSocketServer, WebSocket } from 'ws';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import { BinanceAdapter, NewsAdapter } from './adapters';
+import { MfpAdapter, NewsAdapter } from './adapters';
+import { getTapeHistory, isHistoryRateLimit } from './history';
 import { Trade, OrderBook, Ticker, ClientMessage, ServerMessage } from './types';
 
 dotenv.config();
@@ -25,8 +26,8 @@ app.use(cors({
 
 app.use(express.json());
 
-// Singleton adapter - we reuse one connection to Binance for all clients
-let binanceAdapter: BinanceAdapter | null = null;
+// Singleton adapter - we reuse one MFP stream connection for all clients
+let marketAdapter: MfpAdapter | null = null;
 
 // News adapter singleton
 const newsAdapter = new NewsAdapter();
@@ -37,24 +38,23 @@ const clientSubscriptions: Map<WebSocket, Set<string>> = new Map();
 // Track which symbols have at least one subscriber (for cleanup)
 const subscribedSymbols: Set<string> = new Set();
 
-console.log('\nTapeFlow Server Starting...');
-console.log('Data Source: Binance WebSocket (public API)');
-console.log('Supported: USDT perpetual pairs only\n');
+console.log('\nFlowReplay Live Server Starting...');
+console.log('Data Source: MyFundedPerps market stream (read-only)');
+console.log('Supported: MFP markets with a real trade tape\n');
 
 /**
- * Lazy-initialize the Binance adapter
+ * Lazy-initialize the MFP adapter
  * 
  * We don't connect until the first client subscribes. This avoids
  * wasting bandwidth if the server is running but no one's using it.
  */
-async function initBinanceAdapter(): Promise<BinanceAdapter> {
-  if (binanceAdapter) return binanceAdapter;
+async function initMarketAdapter(): Promise<MfpAdapter> {
+  if (marketAdapter) return marketAdapter;
   
-  binanceAdapter = new BinanceAdapter({});
-  await binanceAdapter.connect();
+  marketAdapter = new MfpAdapter();
   
-  // Wire up event handlers to broadcast data to subscribed clients
-  binanceAdapter.onTrade((trade: Trade) => {
+  // Wire up event handlers before connecting so no startup data is missed
+  marketAdapter.onTrade((trade: Trade) => {
     broadcastToSubscribers(trade.symbol, {
       type: 'trade',
       data: trade,
@@ -62,7 +62,7 @@ async function initBinanceAdapter(): Promise<BinanceAdapter> {
     });
   });
   
-  binanceAdapter.onOrderBook((orderBook: OrderBook) => {
+  marketAdapter.onOrderBook((orderBook: OrderBook) => {
     broadcastToSubscribers(orderBook.symbol, {
       type: 'orderbook',
       data: orderBook,
@@ -70,7 +70,7 @@ async function initBinanceAdapter(): Promise<BinanceAdapter> {
     });
   });
   
-  binanceAdapter.onTicker((ticker: Ticker) => {
+  marketAdapter.onTicker((ticker: Ticker) => {
     broadcastToSubscribers(ticker.symbol, {
       type: 'ticker',
       data: ticker,
@@ -78,15 +78,16 @@ async function initBinanceAdapter(): Promise<BinanceAdapter> {
     });
   });
   
-  binanceAdapter.onError((error: Error) => {
-    console.error('[Binance] Error:', error.message);
+  marketAdapter.onError((error: Error) => {
+    console.error('[MFP] Error:', error.message);
   });
   
-  binanceAdapter.onDisconnect(() => {
-    console.log('[Binance] Disconnected - will attempt reconnect');
+  marketAdapter.onDisconnect(() => {
+    console.log('[MFP] Disconnected - will attempt reconnect');
   });
   
-  return binanceAdapter;
+  await marketAdapter.connect();
+  return marketAdapter;
 }
 
 /**
@@ -147,12 +148,12 @@ wss.on('connection', (ws: WebSocket) => {
     console.log('Client disconnected');
     // Clean up: unsubscribe from any symbols this client was watching
     const subscriptions = clientSubscriptions.get(ws);
+    clientSubscriptions.delete(ws);
     if (subscriptions) {
       for (const symbol of subscriptions) {
         cleanupSymbolSubscription(symbol);
       }
     }
-    clientSubscriptions.delete(ws);
   });
   
   ws.on('error', (error) => {
@@ -163,8 +164,8 @@ wss.on('connection', (ws: WebSocket) => {
 /**
  * Subscribe a client to a symbol's market data
  * 
- * We only support USDT pairs (e.g., BTCUSDT, ETHUSDT) because that's what
- * Binance's spot API gives us. Futures would need a different endpoint.
+ * Markets are checked against MFP's catalog. Markets without a real trade
+ * tape are rejected so the UI never shows made-up order flow.
  */
 async function handleSubscribe(ws: WebSocket, message: ClientMessage): Promise<void> {
   const symbols = message.symbols || (message.symbol ? [message.symbol] : []);
@@ -172,11 +173,12 @@ async function handleSubscribe(ws: WebSocket, message: ClientMessage): Promise<v
   for (const symbol of symbols) {
     const upperSymbol = symbol.toUpperCase();
     
-    // Reject non-USDT pairs early
-    if (!upperSymbol.endsWith('USDT')) {
+    const adapter = await initMarketAdapter();
+    const market = await adapter.validateSymbol(upperSymbol);
+    if (!market.valid) {
       ws.send(JSON.stringify({
         type: 'error',
-        error: 'Invalid symbol. Only USDT pairs are supported (e.g., BTCUSDT, ETHUSDT).',
+        error: market.error,
         symbol: upperSymbol,
         timestamp: Date.now(),
       }));
@@ -189,8 +191,7 @@ async function handleSubscribe(ws: WebSocket, message: ClientMessage): Promise<v
       subscriptions.add(upperSymbol);
     }
     
-    // Start streaming data from Binance
-    const adapter = await initBinanceAdapter();
+    // Start streaming data from MFP
     await adapter.subscribe(upperSymbol, 'crypto');
     subscribedSymbols.add(upperSymbol);
     
@@ -198,7 +199,7 @@ async function handleSubscribe(ws: WebSocket, message: ClientMessage): Promise<v
     ws.send(JSON.stringify({
       type: 'subscribed',
       symbol: upperSymbol,
-      source: 'binance',
+      source: 'mfp',
       assetType: 'crypto',
       timestamp: Date.now(),
     }));
@@ -222,7 +223,7 @@ async function handleUnsubscribe(ws: WebSocket, message: ClientMessage): Promise
       subscriptions.delete(upperSymbol);
     }
     
-    // If no clients are watching this symbol anymore, stop the Binance stream
+    // If no clients are watching this symbol anymore, stop its stream
     cleanupSymbolSubscription(upperSymbol);
     
     ws.send(JSON.stringify({
@@ -236,7 +237,7 @@ async function handleUnsubscribe(ws: WebSocket, message: ClientMessage): Promise
 }
 
 /**
- * Check if anyone is still watching a symbol, and if not, unsubscribe from Binance
+ * Check if anyone is still watching a symbol, and if not, unsubscribe from it
  * 
  * This prevents us from keeping unnecessary streams open when all clients have
  * switched to different symbols.
@@ -253,9 +254,9 @@ function cleanupSymbolSubscription(symbol: string): void {
     }
   }
   
-  // No one watching? Shut down the Binance stream for this symbol
-  if (!hasSubscribers && binanceAdapter) {
-    binanceAdapter.unsubscribe(upperSymbol);
+  // No one watching? Shut down the stream for this symbol
+  if (!hasSubscribers && marketAdapter) {
+    void marketAdapter.unsubscribe(upperSymbol);
     subscribedSymbols.delete(upperSymbol);
   }
 }
@@ -264,7 +265,7 @@ function cleanupSymbolSubscription(symbol: string): void {
  * Validate a symbol before subscribing
  * 
  * Client can use this to check if a symbol exists and is actively trading
- * before committing to a subscription. Hits Binance's exchangeInfo endpoint.
+ * before committing to a subscription. Uses MFP's market catalog.
  */
 async function handleValidate(ws: WebSocket, message: ClientMessage): Promise<void> {
   const symbol = message.symbol?.toUpperCase();
@@ -278,23 +279,8 @@ async function handleValidate(ws: WebSocket, message: ClientMessage): Promise<vo
     return;
   }
   
-  // Quick check before hitting the API
-  if (!symbol.endsWith('USDT')) {
-    ws.send(JSON.stringify({
-      type: 'validation',
-      data: {
-        symbol,
-        valid: false,
-        error: 'Only USDT pairs are supported',
-        assetType: 'crypto',
-      },
-      timestamp: Date.now(),
-    }));
-    return;
-  }
-  
   try {
-    const adapter = await initBinanceAdapter();
+    const adapter = await initMarketAdapter();
     const validation = await adapter.validateSymbol(symbol);
     ws.send(JSON.stringify({
       type: 'validation',
@@ -319,7 +305,7 @@ async function handleValidate(ws: WebSocket, message: ClientMessage): Promise<vo
 app.get('/health', (req, res) => {
   res.json({
     status: 'ok',
-    dataSource: 'binance',
+    dataSource: 'myfundedperps',
     activeConnections: clientSubscriptions.size,
     subscribedSymbols: Array.from(subscribedSymbols),
   });
@@ -328,9 +314,9 @@ app.get('/health', (req, res) => {
 // API info for humans poking around
 app.get('/api/info', (req, res) => {
   res.json({
-    name: 'TapeFlow',
-    dataSource: 'Binance WebSocket API',
-    supportedPairs: 'USDT perpetual futures',
+    name: 'FlowReplay Live',
+    dataSource: 'MyFundedPerps market stream',
+    supportedPairs: 'MFP markets with a real trade tape',
     features: [
       'Real-time trades',
       'Level 2 order book (20 levels)',
@@ -488,6 +474,87 @@ app.get('/api/binance/premiumIndex', async (req, res) => {
   }
 });
 
+// MFP markets this version can show with real order flow
+app.get('/api/mfp/markets', async (_req, res) => {
+  try {
+    const adapter = await initMarketAdapter();
+    await adapter.validateSymbol('BTCUSDT');
+    res.json({ symbols: adapter.getSupportedSymbols(), coverage: adapter.getCoverage() });
+  } catch (error: any) {
+    console.error('[MFP] Market list error:', error.message);
+    res.status(502).json({ error: 'Failed to load MFP markets' });
+  }
+});
+
+const KLINE_INTERVALS = ['1m', '5m', '15m', '1h', '4h'];
+
+// Perpetual snapshots, so charts and books match the venue behind MFP's Binance markets
+async function proxyFutures(req: express.Request, res: express.Response, path: string, params: Record<string, string>): Promise<void> {
+  const clientIp = req.ip || req.socket.remoteAddress || 'unknown';
+  if (!checkRateLimit(`${clientIp}:snapshot`)) {
+    res.status(429).json({ error: 'Rate limit exceeded' });
+    return;
+  }
+  try {
+    const url = new URL(`${BINANCE_FUTURES_API}/${path}`);
+    Object.entries(params).forEach(([key, value]) => url.searchParams.set(key, value));
+    const response = await fetch(url.toString());
+    res.status(response.status).json(await response.json());
+  } catch (error: any) {
+    console.error(`[Binance Proxy] ${path} error:`, error.message);
+    res.status(502).json({ error: `Failed to fetch ${path}` });
+  }
+}
+
+app.get('/api/binance/depth', async (req, res) => {
+  const symbol = validateSymbol(req.query.symbol);
+  if (!symbol) {
+    res.status(400).json({ error: 'Invalid symbol format' });
+    return;
+  }
+  const requested = parseInt(req.query.limit as string) || 20;
+  const limit = [5, 10, 20, 50, 100].find((n) => n >= requested) ?? 100;
+  await proxyFutures(req, res, 'depth', { symbol, limit: String(limit) });
+});
+
+app.get('/api/binance/klines', async (req, res) => {
+  const symbol = validateSymbol(req.query.symbol);
+  const interval = req.query.interval as string;
+  if (!symbol || !KLINE_INTERVALS.includes(interval)) {
+    res.status(400).json({ error: 'Invalid symbol or interval' });
+    return;
+  }
+  const limit = Math.min(Math.max(1, parseInt(req.query.limit as string) || 200), MAX_LIMIT);
+  await proxyFutures(req, res, 'klines', { symbol, interval, limit: String(limit) });
+});
+
+// Exact recent tape for MFP's Binance-sourced markets, rebuilt from the public venue history
+app.get('/api/mfp/history', async (req, res) => {
+  const clientIp = req.ip || req.socket.remoteAddress || 'unknown';
+  if (!checkRateLimit(`${clientIp}:history`)) {
+    res.status(429).json({ error: 'Rate limit exceeded' });
+    return;
+  }
+  const symbol = validateSymbol(req.query.symbol);
+  if (!symbol) {
+    res.status(400).json({ error: 'Invalid symbol format' });
+    return;
+  }
+  const minutes = Math.min(Math.max(1, parseInt(req.query.minutes as string) || 30), 60);
+  try {
+    const adapter = await initMarketAdapter();
+    const market = await adapter.validateSymbol(symbol);
+    if (!market.valid) {
+      res.status(422).json({ error: market.error });
+      return;
+    }
+    res.json(await getTapeHistory(symbol, minutes));
+  } catch (error: any) {
+    console.error(`[History] ${symbol} error:`, error.message);
+    res.status(isHistoryRateLimit(error) ? 503 : 502).json({ error: 'Trade history is unavailable right now' });
+  }
+});
+
 // Wire up news broadcaster to WebSocket
 newsAdapter.onNews((item) => {
   const message: ServerMessage = {
@@ -505,15 +572,17 @@ newsAdapter.onNews((item) => {
 });
 
 // Fire it up
-const PORT = process.env.PORT || 3001;
+const PORT = Number(process.env.PORT) || 3001;
+// Local only by default, because this process can hold a trader's API key
+const HOST = process.env.HOST || '127.0.0.1';
 
-server.listen(PORT, () => {
-  console.log(`TapeFlow Server running on port ${PORT}`);
+server.listen(PORT, HOST, () => {
+  console.log(`FlowReplay Live Server running on ${HOST}:${PORT}`);
   console.log(`WebSocket: ws://localhost:${PORT}`);
   console.log(`Health: http://localhost:${PORT}/health\n`);
 });
 
-// Clean shutdown - close client connections and Binance stream gracefully
+// Clean shutdown - close client connections and the market stream gracefully
 process.on('SIGINT', async () => {
   console.log('\nShutting down...');
   
@@ -521,8 +590,8 @@ process.on('SIGINT', async () => {
     client.close();
   }
   
-  if (binanceAdapter) {
-    await binanceAdapter.disconnect();
+  if (marketAdapter) {
+    await marketAdapter.disconnect();
   }
   
   server.close(() => {

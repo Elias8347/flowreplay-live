@@ -166,7 +166,8 @@ export const SessionStats = memo(function SessionStats({
     const MAX_LARGE_TRADES = 10;
     
     const unsubscribe = subscribeToTrades((trade: Trade) => {
-      if (trade.symbol.toUpperCase() !== upperSymbol) return;
+      // Liquidations are already in the tape
+      if (trade.symbol.toUpperCase() !== upperSymbol || trade.isLiquidation) return;
       
       const now = Date.now();
       let s = sessionRef.current;

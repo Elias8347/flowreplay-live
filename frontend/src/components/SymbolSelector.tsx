@@ -5,12 +5,7 @@ import { useMarketStore } from '../stores/useMarketStore';
 import { cn } from '../lib/utils';
 import { getAssetTypeColor } from '../utils/formatters';
 import type { SymbolInfo } from '../types';
-
-const POPULAR_SYMBOLS = [
-  'BTCUSDT', 'ETHUSDT', 'SOLUSDT', 'BNBUSDT',
-  'XRPUSDT', 'ADAUSDT', 'DOGEUSDT', 'AVAXUSDT',
-  'DOTUSDT', 'MATICUSDT', 'LINKUSDT', 'LTCUSDT'
-];
+import { useMfpSymbols } from '../hooks/useMfpSymbols';
 
 interface SymbolSelectorProps {
   onClose?: () => void;
@@ -28,6 +23,7 @@ export function SymbolSelector({ onClose }: SymbolSelectorProps) {
   const validateSymbol = useMarketStore((state) => state.validateSymbol);
   const activeSymbols = useMarketStore((state) => state.activeSymbols);
   const isConnected = useMarketStore((state) => state.isConnected);
+  const marketSymbols = useMfpSymbols();
 
   useEffect(() => {
     inputRef.current?.focus();
@@ -60,8 +56,8 @@ export function SymbolSelector({ onClose }: SymbolSelectorProps) {
   const handleSubscribe = useCallback((symbol: string) => {
     const upperSymbol = symbol.toUpperCase().trim();
 
-    if (!upperSymbol.endsWith('USDT')) {
-      alert('Invalid Symbol. Please use a valid Crypto Pair (e.g., BTCUSDT, ETHUSDT).');
+    if (!marketSymbols.includes(upperSymbol)) {
+      setError('This market is unavailable or has no public trade tape.');
       return;
     }
 
@@ -77,7 +73,7 @@ export function SymbolSelector({ onClose }: SymbolSelectorProps) {
     setValidationResult(null);
     setError(null);
     onClose?.();
-  }, [subscribe, addTab, activeSymbols, onClose]);
+  }, [subscribe, addTab, activeSymbols, marketSymbols, onClose]);
 
   const handleSubmit = useCallback((e: React.FormEvent) => {
     e.preventDefault();
@@ -166,7 +162,7 @@ export function SymbolSelector({ onClose }: SymbolSelectorProps) {
         </div>
 
         <div className="grid grid-cols-4 gap-2">
-          {POPULAR_SYMBOLS.map((symbol) => {
+          {marketSymbols.slice(0, 12).map((symbol) => {
             const isActive = activeSymbols.includes(symbol);
             return (
               <button
