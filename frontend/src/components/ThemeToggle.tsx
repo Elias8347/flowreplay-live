@@ -37,7 +37,7 @@ export function ThemeToggle({ className, showLabel = false }: ThemeToggleProps) 
     <button
       onClick={toggleTheme}
       className={cn(
-        "flex items-center gap-1.5 px-2 py-1 rounded border transition-all duration-200",
+        "flex items-center gap-1.5 px-2 py-1 rounded-sm border transition-all duration-200",
         isHacker
           ? "border-[#00FF00] text-[#00FF00] hover:bg-[#001100] hover:shadow-[0_0_10px_rgba(0,255,0,0.3)]"
           : "border-[#58a6ff] text-[#58a6ff] hover:bg-[#1f3a5c] hover:shadow-[0_0_10px_rgba(88,166,255,0.3)]",

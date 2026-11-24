@@ -239,7 +239,7 @@ export function FootprintChart({
         height={dimensions.height}
         onReady={handleReady}
       />
-      <div className="pointer-events-none absolute right-2 top-1 rounded bg-black/70 px-1.5 py-0.5 font-mono text-[10px] text-gray-300">
+      <div className="pointer-events-none absolute right-2 top-1 rounded-sm bg-black/70 px-1.5 py-0.5 font-mono text-[10px] text-gray-300">
         {historyLabel}
       </div>
     </div>

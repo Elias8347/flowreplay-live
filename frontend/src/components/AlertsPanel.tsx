@@ -105,7 +105,7 @@ export const AlertToastContainer = memo(function AlertToastContainer() {
   if (toasts.length === 0) return null;
 
   return (
-    <div className="fixed top-16 right-4 z-[200] flex flex-col gap-2">
+    <div className="fixed top-16 right-4 z-200 flex flex-col gap-2">
       {toasts.map((toast) => (
         <Toast 
           key={toast.timestamp} 
@@ -238,7 +238,7 @@ export const AlertsPanel = memo(function AlertsPanel({
 
   return (
     <div 
-      className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-[100]"
+      className="fixed inset-0 bg-black/80 backdrop-blur-xs flex items-center justify-center z-100"
       onClick={onClose}
     >
       <div 
@@ -254,7 +254,7 @@ export const AlertsPanel = memo(function AlertsPanel({
           <div className="flex items-center gap-2">
             <button
               onClick={() => setShowForm(!showForm)}
-              className="px-2 py-1 text-xs font-mono rounded border transition-colors"
+              className="px-2 py-1 text-xs font-mono rounded-sm border transition-colors"
               style={{ 
                 borderColor: accentColor, 
                 color: accentColor,
@@ -283,7 +283,7 @@ export const AlertsPanel = memo(function AlertsPanel({
                 <select
                   value={form.type}
                   onChange={(e) => setForm(f => ({ ...f, type: e.target.value as any }))}
-                  className="w-full mt-1 px-2 py-1.5 bg-black border border-gray-700 rounded text-xs font-mono text-white"
+                  className="w-full mt-1 px-2 py-1.5 bg-black border border-gray-700 rounded-sm text-xs font-mono text-white"
                 >
                   <option value="price">Price Level</option>
                   <option value="volume">Volume Spike</option>
@@ -298,7 +298,7 @@ export const AlertsPanel = memo(function AlertsPanel({
                   <select
                     value={form.direction}
                     onChange={(e) => setForm(f => ({ ...f, direction: e.target.value as any }))}
-                    className="w-full mt-1 px-2 py-1.5 bg-black border border-gray-700 rounded text-xs font-mono text-white"
+                    className="w-full mt-1 px-2 py-1.5 bg-black border border-gray-700 rounded-sm text-xs font-mono text-white"
                   >
                     <option value="above">Above</option>
                     <option value="below">Below</option>
@@ -315,7 +315,7 @@ export const AlertsPanel = memo(function AlertsPanel({
                   type="number"
                   value={form.value}
                   onChange={(e) => setForm(f => ({ ...f, value: e.target.value }))}
-                  className="w-full mt-1 px-2 py-1.5 bg-black border border-gray-700 rounded text-xs font-mono text-white"
+                  className="w-full mt-1 px-2 py-1.5 bg-black border border-gray-700 rounded-sm text-xs font-mono text-white"
                   placeholder="0"
                 />
               </div>
@@ -327,7 +327,7 @@ export const AlertsPanel = memo(function AlertsPanel({
                   type="text"
                   value={form.name}
                   onChange={(e) => setForm(f => ({ ...f, name: e.target.value }))}
-                  className="w-full mt-1 px-2 py-1.5 bg-black border border-gray-700 rounded text-xs font-mono text-white"
+                  className="w-full mt-1 px-2 py-1.5 bg-black border border-gray-700 rounded-sm text-xs font-mono text-white"
                   placeholder="Auto-generated"
                 />
               </div>
@@ -335,7 +335,7 @@ export const AlertsPanel = memo(function AlertsPanel({
 
             <button
               onClick={handleCreateAlert}
-              className="w-full mt-3 py-2 text-xs font-mono font-bold rounded transition-colors"
+              className="w-full mt-3 py-2 text-xs font-mono font-bold rounded-sm transition-colors"
               style={{ 
                 backgroundColor: accentColor, 
                 color: 'black',
@@ -359,7 +359,7 @@ export const AlertsPanel = memo(function AlertsPanel({
                 <div 
                   key={rule.id}
                   className={cn(
-                    "flex items-center justify-between p-2 rounded border transition-colors",
+                    "flex items-center justify-between p-2 rounded-sm border transition-colors",
                     rule.enabled 
                       ? "border-gray-700 bg-gray-900/50" 
                       : "border-gray-800 bg-black opacity-50"

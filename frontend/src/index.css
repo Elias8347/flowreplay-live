@@ -1,537 +1,692 @@
 /* Import FlexLayout theme - must come before Tailwind */
-@import 'flexlayout-react/style/dark.css';
-@import './styles/flexlayout-theme.css';
-@import './styles/themes.css';
+@import 'flexlayout-react/style/dark.css' layer(base);
+@import './styles/flexlayout-theme.css' layer(base);
+@import './styles/themes.css' layer(base);
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@import '@fontsource-variable/geist';
+@import '@fontsource-variable/geist-mono';
+@import './styles/tokens.css';
 
-/* ============================================================================
-   TAPEFLOW TERMINAL THEME - Global Styles
-   High-contrast dark terminal aesthetic with neon colors
-   ============================================================================ */
+@custom-variant dark (&:is(.dark *));
 
-/* ============================================================================
-   COLOR PALETTE (for reference)
-   - Background: #000000 (Pure Black)
-   - Border: #1a1a1a or #222222 (Very Dark Gray)
-   - Buy/Bull: #00FF41 (Terminal Green / Matrix Green)
-   - Sell/Bear: #FF4545 (Bright Red)
-   - Accent: #FF6600 (Orange - for headers)
-   - Muted Text: #666666 (Gray)
-   ============================================================================ */
-
-/* ============================================================================
-   REACT-GRID-LAYOUT STYLES
-   User-resizable draggable grid panels
-   ============================================================================ */
-
-/* Grid container styling */
-.layout {
-  background-color: #000000;
+/* shadcn/ui theme, mapped to FlowReplay's approved tokens (design tokens v0.1.0) */
+:root {
+  --radius: 0.625rem;
+  --background: var(--fr-color-surface-app);
+  --foreground: var(--fr-color-text-primary);
+  --card: var(--fr-color-surface-panel);
+  --card-foreground: var(--fr-color-text-primary);
+  --popover: var(--fr-color-surface-panel);
+  --popover-foreground: var(--fr-color-text-primary);
+  /* Brand green is reserved for primary actions */
+  --primary: var(--fr-color-brand-default);
+  --primary-foreground: var(--fr-color-text-on-brand);
+  /* Selected states use the raised surface so they never look like a buy signal */
+  --secondary: var(--fr-color-surface-raised);
+  --secondary-foreground: var(--fr-color-text-primary);
+  --muted: var(--fr-color-surface-raised);
+  --muted-foreground: var(--fr-color-text-muted);
+  --accent: var(--fr-color-surface-hover);
+  --accent-foreground: var(--fr-color-text-primary);
+  --destructive: var(--fr-color-risk-error);
+  --border: var(--fr-color-border-default);
+  --input: var(--fr-color-border-default);
+  --ring: var(--fr-color-brand-focus);
 }
 
-/* Grid item styling - fill height/width and support flex children */
-.react-grid-item {
-  background-color: transparent;
-  overflow: hidden;
-  transition: none !important;
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 10px;
+  --radius-xl: 14px;
+
+  /* FlowReplay semantic colors */
+  --color-surface-app: var(--fr-color-surface-app);
+  --color-surface-panel: var(--fr-color-surface-panel);
+  --color-surface-raised: var(--fr-color-surface-raised);
+  --color-surface-inset: var(--fr-color-surface-inset);
+  --color-surface-hover: var(--fr-color-surface-hover);
+  --color-line: var(--fr-color-border-default);
+  --color-line-subtle: var(--fr-color-border-subtle);
+  --color-text-secondary: var(--fr-color-text-secondary);
+  --color-buy: var(--fr-color-market-buy);
+  --color-sell: var(--fr-color-market-sell);
+  --color-poc: var(--fr-color-market-poc);
+  --color-own: var(--fr-color-own-default);
+  --color-warning: var(--fr-color-risk-warning);
+  --color-brand: var(--fr-color-brand-default);
 }
 
-/* Grid item content should fill available space */
-.react-grid-item > .grid-item {
-  height: 100%;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-}
+@theme {
+  --color-trade-buy: #22c55e;
+  --color-trade-buy-light: #4ade80;
+  --color-trade-buy-dark: #16a34a;
 
-.react-grid-item > .grid-item > * {
-  flex: 1;
-  min-height: 0;
-  display: flex;
-  flex-direction: column;
-}
+  --color-trade-sell: #ef4444;
+  --color-trade-sell-light: #f87171;
+  --color-trade-sell-dark: #dc2626;
 
-/* Placeholder during drag/resize */
-.react-grid-placeholder {
-  background-color: #00FF41 !important;
-  opacity: 0.15 !important;
-  border: 2px dashed #00FF41 !important;
-  border-radius: 4px;
-}
+  --color-trade-neutral: #6b7280;
+  --color-trade-neutral-light: #9ca3af;
+  --color-trade-neutral-dark: #4b5563;
 
-/* Resize handle styling */
-.react-resizable-handle {
-  opacity: 0;
-  transition: opacity 0.2s ease;
-}
+  --font-mono: 'Geist Mono Variable', ui-monospace, monospace;
+  --font-sans: 'Geist Variable', system-ui, sans-serif;
 
-.react-grid-item:hover .react-resizable-handle {
-  opacity: 0.6;
-}
+  --animate-fade-in: fade-in 0.2s ease-out;
+  --animate-slide-up: slide-up 0.3s ease-out;
+  --animate-pulse-slow: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  --animate-flash-green: flash-green 0.5s ease-out forwards;
+  --animate-flash-red: flash-red 0.5s ease-out forwards;
 
-.react-resizable-handle::after {
-  border-color: #00FF41 !important;
-}
+  --transition-property-colors-opacity:
+    background-color, border-color, color, fill, stroke, opacity;
 
-/* Drag handle styling */
-.drag-handle {
-  cursor: move;
-  user-select: none;
-  padding: 2px 4px;
-  font-size: 10px;
-  letter-spacing: 2px;
-}
-
-.drag-handle:hover {
-  color: #00FF41 !important;
-}
-
-/* Dragging state */
-.react-grid-item.react-draggable-dragging {
-  z-index: 100;
-  box-shadow: 0 0 20px rgba(0, 255, 65, 0.3);
-}
-
-/* Resizing state */
-.react-grid-item.resizing {
-  z-index: 100;
-  box-shadow: 0 0 20px rgba(0, 255, 65, 0.2);
-}
-
-/* ============================================================================
-   BENTO-BOX DASHBOARD GRID LAYOUT
-   Fills 100% of the viewport
-   ============================================================================ */
-
-/* Grid area class assignments */
-.bento-tape { grid-area: tape; min-height: 0; min-width: 0; }
-.bento-chart { grid-area: chart; min-height: 0; min-width: 0; }
-.bento-footprint { grid-area: footprint; min-height: 0; min-width: 0; }
-.bento-cvd { grid-area: cvd; min-height: 0; min-width: 0; }
-.bento-orderbook { grid-area: orderbook; min-height: 0; min-width: 0; }
-.bento-profile { grid-area: profile; min-height: 0; min-width: 0; }
-.bento-tools { grid-area: tools; min-height: 0; min-width: 0; }
-.bento-quant { grid-area: quant; min-height: 0; min-width: 0; }
-
-.bento-dashboard {
-  display: grid;
-  width: 100%;
-  height: 100%;
-  padding: 4px;
-  gap: 4px;
-  background-color: #000000;
-  
-  /* 
-   * Grid Template:
-   * ┌─────────┬───────────────────┬────────────┐
-   * │  tape   │      chart        │  orderbook │
-   * │         ├─────────┬─────────┤            │
-   * │         │footprint│   cvd   │  profile   │
-   * ├─────────┴─────────┴─────────┼────────────┤
-   * │          tools              │   quant    │
-   * └─────────────────────────────┴────────────┘
-   */
-  grid-template-columns: minmax(200px, 0.8fr) minmax(300px, 2fr) minmax(200px, 1fr) minmax(280px, 1.2fr);
-  grid-template-rows: minmax(250px, 2fr) minmax(180px, 1fr) minmax(200px, 1fr);
-  grid-template-areas:
-    "tape chart chart orderbook"
-    "tape footprint cvd profile"
-    "tools tools tools quant";
-}
-
-/* Responsive adjustments */
-@media (max-width: 1400px) {
-  .bento-dashboard {
-    grid-template-columns: minmax(200px, 1fr) minmax(250px, 1.8fr) minmax(80px, 0.4fr) minmax(250px, 1fr);
-    grid-template-rows: minmax(180px, 1.4fr) minmax(120px, 0.9fr) minmax(250px, 1.1fr);
+  @keyframes fade-in {
+    0% {
+      opacity: 0;
+      transform: translateY(-4px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  @keyframes slide-up {
+    0% {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  @keyframes flash-green {
+    0% {
+      background-color: rgba(74, 222, 128, 0.5);
+    }
+    100% {
+      background-color: transparent;
+    }
+  }
+  @keyframes flash-red {
+    0% {
+      background-color: rgba(248, 113, 113, 0.5);
+    }
+    100% {
+      background-color: transparent;
+    }
   }
 }
 
-@media (max-width: 1200px) {
-  .bento-dashboard {
-    grid-template-columns: minmax(180px, 1fr) minmax(200px, 1.5fr) minmax(200px, 1fr);
-    grid-template-rows: minmax(160px, 1fr) minmax(120px, 0.8fr) minmax(100px, 0.5fr) minmax(220px, 1fr);
-    grid-template-areas:
-      "tape chart orderbook"
-      "tape footprint profile"
-      "tape cvd profile"
-      "tools tools quant";
+/*
+  The default border color has changed to `currentcolor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--border);
   }
 }
 
-@media (max-width: 900px) {
-  .bento-dashboard {
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: minmax(150px, 1fr) minmax(150px, 1fr) minmax(120px, 0.8fr) minmax(200px, 1fr);
-    grid-template-areas:
-      "tape orderbook"
-      "chart chart"
-      "footprint cvd"
-      "tools quant";
+/* Legacy TapeFlow styles. Kept in the base layer so Tailwind and shadcn component classes take priority. */
+@layer base {
+  /* ============================================================================
+     TAPEFLOW TERMINAL THEME - Global Styles
+     High-contrast dark terminal aesthetic with neon colors
+     ============================================================================ */
+
+  /* ============================================================================
+     COLOR PALETTE (for reference)
+     - Background: #000000 (Pure Black)
+     - Border: #1a1a1a or #222222 (Very Dark Gray)
+     - Buy/Bull: #00FF41 (Terminal Green / Matrix Green)
+     - Sell/Bear: #FF4545 (Bright Red)
+     - Accent: #FF6600 (Orange - for headers)
+     - Muted Text: #666666 (Gray)
+     ============================================================================ */
+
+  /* ============================================================================
+     REACT-GRID-LAYOUT STYLES
+     User-resizable draggable grid panels
+     ============================================================================ */
+
+  /* Grid container styling */
+  .layout {
+    background-color: #000000;
   }
-  
-  .profile-panel {
-    display: none;
+
+  /* Grid item styling - fill height/width and support flex children */
+  .react-grid-item {
+    background-color: transparent;
+    overflow: hidden;
+    transition: none !important;
   }
-}
 
-/* Panel-specific overrides for grid areas */
-[style*="grid-area: tape"] { grid-area: tape; }
-[style*="grid-area: chart"] { grid-area: chart; }
-[style*="grid-area: footprint"] { grid-area: footprint; }
-[style*="grid-area: cvd"] { grid-area: cvd; }
-[style*="grid-area: orderbook"] { grid-area: orderbook; }
-[style*="grid-area: profile"] { grid-area: profile; }
-[style*="grid-area: tools"] { grid-area: tools; }
-[style*="grid-area: quant"] { grid-area: quant; }
+  /* Grid item content should fill available space */
+  .react-grid-item > .grid-item {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+  }
 
-/* Panel styling */
-.tape-panel,
-.chart-panel,
-.footprint-panel,
-.cvd-panel,
-.orderbook-panel,
-.profile-panel,
-.tabbed-panel,
-.quant-panel {
-  min-height: 0;
-  min-width: 0;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-}
+  .react-grid-item > .grid-item > * {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+  }
 
-/* Ensure chart containers fill their space */
-.chart-panel > *,
-.footprint-panel > *,
-.cvd-panel > *,
-.profile-panel > * {
-  flex: 1;
-  min-height: 0;
-}
+  /* Placeholder during drag/resize */
+  .react-grid-placeholder {
+    background-color: #00FF41 !important;
+    opacity: 0.15 !important;
+    border: 2px dashed #00FF41 !important;
+    border-radius: 4px;
+  }
 
-/* Chart wrapper should expand to fill container */
-.chart-panel > div:last-child,
-.footprint-panel > div:last-child,
-.cvd-panel > div:last-child,
-.profile-panel > div:last-child {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  flex-grow: 1;
-}
-
-/* Canvas and SVG charts should fill their wrappers */
-.chart-panel canvas,
-.footprint-panel canvas,
-.cvd-panel canvas,
-.profile-panel canvas,
-.chart-panel svg,
-.footprint-panel svg {
-  width: 100% !important;
-  height: 100% !important;
-  flex-grow: 1;
-}
-
-.tabbed-panel,
-.quant-panel {
-  display: flex;
-  flex-direction: column;
-}
-
-.tabbed-panel > *,
-.quant-panel > * {
-  flex: 1;
-  min-height: 0;
-}
-
-/* ============================================================================
-   BASE STYLES
-   ============================================================================ */
-
-* {
-  box-sizing: border-box;
-}
-
-html {
-  color-scheme: dark;
-}
-
-body {
-  margin: 0;
-  padding: 0;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
-  background-color: #000000;
-  color: #e5e5e5;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-/* Ensure full height chain from html to app */
-html, body {
-  height: 100%;
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
-}
-
-/* Force all root containers to pure black and full height */
-#root, .app-container, main {
-  background-color: #000000;
-  height: 100%;
-  overflow-x: hidden; /* Prevent horizontal overflow causing right-edge clipping */
-}
-
-/* Fix flex children overflow - ensures content doesn't push layout bounds */
-#root > *, .app-container > *, main > * {
-  min-width: 0;
-  min-height: 0;
-}
-
-/* FlexLayout children must respect parent bounds */
-.flexlayout__layout > * {
-  min-width: 0;
-}
-
-.flexlayout__tab > * {
-  min-width: 0;
-  max-width: 100%;
-  overflow: hidden;
-}
-
-/* ============================================================================
-   TYPOGRAPHY
-   ============================================================================ */
-
-/* Monospace font for all numbers */
-.font-mono {
-  font-family: 'JetBrains Mono', 'Fira Code', 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
-}
-
-/* Tabular numbers for alignment */
-.tabular-nums {
-  font-variant-numeric: tabular-nums;
-}
-
-/* Apply tabular-nums globally to elements that show numbers */
-table, .data-grid, [class*="price"], [class*="volume"], [class*="amount"] {
-  font-variant-numeric: tabular-nums;
-}
-
-/* Data grid styles */
-.data-grid {
-  display: grid;
-  font-variant-numeric: tabular-nums;
-}
-
-/* ============================================================================
-   CUSTOM SCROLLBARS - Thin, dark, minimal
-   ============================================================================ */
-
-/* Firefox */
-* {
-  scrollbar-width: thin;
-  scrollbar-color: #333333 #000000;
-}
-
-/* WebKit (Chrome, Safari, Edge) */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-
-::-webkit-scrollbar-track {
-  background: #000000;
-}
-
-::-webkit-scrollbar-thumb {
-  background-color: #333333;
-  border-radius: 3px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background-color: #444444;
-}
-
-/* Corner */
-::-webkit-scrollbar-corner {
-  background: #000000;
-}
-
-/* Legacy class for backwards compatibility */
-.scrollbar-thin {
-  scrollbar-width: thin;
-  scrollbar-color: #333333 #000000;
-}
-
-/* ============================================================================
-   BUTTONS & INTERACTIVE ELEMENTS
-   ============================================================================ */
-
-/* Muted button style */
-button, .btn {
-  background-color: #1a1a1a;
-  border: 1px solid #333333;
-  color: #999999;
-  transition: background-color 0.15s ease, border-color 0.15s ease;
-}
-
-button:hover, .btn:hover {
-  background-color: #222222;
-  border-color: #444444;
-}
-
-button:active, .btn:active {
-  background-color: #111111;
-}
-
-button:focus, .btn:focus {
-  outline: none;
-  border-color: #555555;
-}
-
-/* Active/selected button state */
-button.active, .btn.active {
-  background-color: #1a1a1a;
-  border-color: #00FF41;
-  color: #00FF41;
-}
-
-/* Custom focus styles */
-input:focus, select:focus {
-  outline: none;
-  border-color: #444444;
-}
-
-/* ============================================================================
-   BORDERS & PANELS
-   ============================================================================ */
-
-/* Override Tailwind's border colors to be darker */
-.border-gray-700 {
-  border-color: #222222;
-}
-
-.border-gray-800 {
-  border-color: #1a1a1a;
-}
-
-.border-gray-900 {
-  border-color: #111111;
-}
-
-/* Panel backgrounds */
-.bg-gray-800 {
-  background-color: #0a0a0a;
-}
-
-.bg-gray-900 {
-  background-color: #050505;
-}
-
-.bg-gray-950 {
-  background-color: #000000;
-}
-
-/* ============================================================================
-   ORDER BOOK HEATMAP - Using neon colors
-   ============================================================================ */
-
-.heatmap-bid {
-  background: linear-gradient(to left, transparent, rgba(0, 255, 65, 0.15));
-}
-
-.heatmap-ask {
-  background: linear-gradient(to right, transparent, rgba(255, 69, 69, 0.15));
-}
-
-/* ============================================================================
-   ANIMATIONS - Minimal, no distracting effects
-   ============================================================================ */
-
-/* Subtle fade for new elements */
-@keyframes fade-in {
-  from {
+  /* Resize handle styling */
+  .react-resizable-handle {
     opacity: 0;
+    transition: opacity 0.2s ease;
   }
-  to {
-    opacity: 1;
+
+  .react-grid-item:hover .react-resizable-handle {
+    opacity: 0.6;
   }
-}
 
-.animate-fade-in {
-  animation: fade-in 0.15s ease-out;
-}
-
-/* Pulse animation for live indicator */
-@keyframes pulse-ring {
-  0% {
-    transform: scale(0.8);
-    opacity: 1;
+  .react-resizable-handle::after {
+    border-color: #00FF41 !important;
   }
-  100% {
-    transform: scale(2);
-    opacity: 0;
+
+  /* Drag handle styling */
+  .drag-handle {
+    cursor: move;
+    user-select: none;
+    padding: 2px 4px;
+    font-size: 10px;
+    letter-spacing: 2px;
   }
-}
 
-.pulse-ring::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: 50%;
-  animation: pulse-ring 1.5s ease-out infinite;
-}
-
-/* Loading skeleton */
-@keyframes shimmer {
-  0% {
-    background-position: -200% 0;
+  .drag-handle:hover {
+    color: #00FF41 !important;
   }
-  100% {
-    background-position: 200% 0;
+
+  /* Dragging state */
+  .react-grid-item.react-draggable-dragging {
+    z-index: 100;
+    box-shadow: 0 0 20px rgba(0, 255, 65, 0.3);
   }
-}
 
-.skeleton {
-  background: linear-gradient(
-    90deg,
-    #111111 25%,
-    #222222 50%,
-    #111111 75%
-  );
-  background-size: 200% 100%;
-  animation: shimmer 1.5s infinite;
-}
+  /* Resizing state */
+  .react-grid-item.resizing {
+    z-index: 100;
+    box-shadow: 0 0 20px rgba(0, 255, 65, 0.2);
+  }
 
-/* ============================================================================
-   UTILITY CLASSES
-   ============================================================================ */
+  /* ============================================================================
+     BENTO-BOX DASHBOARD GRID LAYOUT
+     Fills 100% of the viewport
+     ============================================================================ */
 
-/* Glass morphism effects (updated for darker theme) */
-.glass {
-  background: rgba(0, 0, 0, 0.8);
-  backdrop-filter: blur(10px);
-  border: 1px solid #222222;
-}
+  /* Grid area class assignments */
+  .bento-tape { grid-area: tape; min-height: 0; min-width: 0; }
+  .bento-chart { grid-area: chart; min-height: 0; min-width: 0; }
+  .bento-footprint { grid-area: footprint; min-height: 0; min-width: 0; }
+  .bento-cvd { grid-area: cvd; min-height: 0; min-width: 0; }
+  .bento-orderbook { grid-area: orderbook; min-height: 0; min-width: 0; }
+  .bento-profile { grid-area: profile; min-height: 0; min-width: 0; }
+  .bento-tools { grid-area: tools; min-height: 0; min-width: 0; }
+  .bento-quant { grid-area: quant; min-height: 0; min-width: 0; }
 
-/* Gradient text */
-.gradient-text {
-  background: linear-gradient(135deg, #00FF41, #00CC33);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
+  .bento-dashboard {
+    display: grid;
+    width: 100%;
+    height: 100%;
+    padding: 4px;
+    gap: 4px;
+    background-color: #000000;
+    
+    /* 
+     * Grid Template:
+     * ┌─────────┬───────────────────┬────────────┐
+     * │  tape   │      chart        │  orderbook │
+     * │         ├─────────┬─────────┤            │
+     * │         │footprint│   cvd   │  profile   │
+     * ├─────────┴─────────┴─────────┼────────────┤
+     * │          tools              │   quant    │
+     * └─────────────────────────────┴────────────┘
+     */
+    grid-template-columns: minmax(200px, 0.8fr) minmax(300px, 2fr) minmax(200px, 1fr) minmax(280px, 1.2fr);
+    grid-template-rows: minmax(250px, 2fr) minmax(180px, 1fr) minmax(200px, 1fr);
+    grid-template-areas:
+      "tape chart chart orderbook"
+      "tape footprint cvd profile"
+      "tools tools tools quant";
+  }
 
-/* Prevent text selection in interactive elements */
-.no-select {
-  user-select: none;
-}
+  /* Responsive adjustments */
+  @media (max-width: 1400px) {
+    .bento-dashboard {
+      grid-template-columns: minmax(200px, 1fr) minmax(250px, 1.8fr) minmax(80px, 0.4fr) minmax(250px, 1fr);
+      grid-template-rows: minmax(180px, 1.4fr) minmax(120px, 0.9fr) minmax(250px, 1.1fr);
+    }
+  }
 
-/* Trade row base - no transitions for 60fps performance */
-.trade-row {
-  background-color: transparent;
+  @media (max-width: 1200px) {
+    .bento-dashboard {
+      grid-template-columns: minmax(180px, 1fr) minmax(200px, 1.5fr) minmax(200px, 1fr);
+      grid-template-rows: minmax(160px, 1fr) minmax(120px, 0.8fr) minmax(100px, 0.5fr) minmax(220px, 1fr);
+      grid-template-areas:
+        "tape chart orderbook"
+        "tape footprint profile"
+        "tape cvd profile"
+        "tools tools quant";
+    }
+  }
+
+  @media (max-width: 900px) {
+    .bento-dashboard {
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: minmax(150px, 1fr) minmax(150px, 1fr) minmax(120px, 0.8fr) minmax(200px, 1fr);
+      grid-template-areas:
+        "tape orderbook"
+        "chart chart"
+        "footprint cvd"
+        "tools quant";
+    }
+    
+    .profile-panel {
+      display: none;
+    }
+  }
+
+  /* Panel-specific overrides for grid areas */
+  [style*="grid-area: tape"] { grid-area: tape; }
+  [style*="grid-area: chart"] { grid-area: chart; }
+  [style*="grid-area: footprint"] { grid-area: footprint; }
+  [style*="grid-area: cvd"] { grid-area: cvd; }
+  [style*="grid-area: orderbook"] { grid-area: orderbook; }
+  [style*="grid-area: profile"] { grid-area: profile; }
+  [style*="grid-area: tools"] { grid-area: tools; }
+  [style*="grid-area: quant"] { grid-area: quant; }
+
+  /* Panel styling */
+  .tape-panel,
+  .chart-panel,
+  .footprint-panel,
+  .cvd-panel,
+  .orderbook-panel,
+  .profile-panel,
+  .tabbed-panel,
+  .quant-panel {
+    min-height: 0;
+    min-width: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Ensure chart containers fill their space */
+  .chart-panel > *,
+  .footprint-panel > *,
+  .cvd-panel > *,
+  .profile-panel > * {
+    flex: 1;
+    min-height: 0;
+  }
+
+  /* Chart wrapper should expand to fill container */
+  .chart-panel > div:last-child,
+  .footprint-panel > div:last-child,
+  .cvd-panel > div:last-child,
+  .profile-panel > div:last-child {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    flex-grow: 1;
+  }
+
+  /* Canvas and SVG charts should fill their wrappers */
+  .chart-panel canvas,
+  .footprint-panel canvas,
+  .cvd-panel canvas,
+  .profile-panel canvas,
+  .chart-panel svg,
+  .footprint-panel svg {
+    width: 100% !important;
+    height: 100% !important;
+    flex-grow: 1;
+  }
+
+  .tabbed-panel,
+  .quant-panel {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .tabbed-panel > *,
+  .quant-panel > * {
+    flex: 1;
+    min-height: 0;
+  }
+
+  /* ============================================================================
+     BASE STYLES
+     ============================================================================ */
+
+  * {
+    box-sizing: border-box;
+  }
+
+  html {
+    color-scheme: dark;
+  }
+
+  body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+    background-color: #000000;
+    color: #e5e5e5;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Ensure full height chain from html to app */
+  html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+  }
+
+  /* Force all root containers to pure black and full height */
+  #root, .app-container, main {
+    background-color: #000000;
+    height: 100%;
+    overflow-x: hidden; /* Prevent horizontal overflow causing right-edge clipping */
+  }
+
+  /* Fix flex children overflow - ensures content doesn't push layout bounds */
+  #root > *, .app-container > *, main > * {
+    min-width: 0;
+    min-height: 0;
+  }
+
+  /* FlexLayout children must respect parent bounds */
+  .flexlayout__layout > * {
+    min-width: 0;
+  }
+
+  .flexlayout__tab > * {
+    min-width: 0;
+    max-width: 100%;
+    overflow: hidden;
+  }
+
+  /* ============================================================================
+     TYPOGRAPHY
+     ============================================================================ */
+
+  /* Monospace font for all numbers */
+  .font-mono {
+    font-family: 'JetBrains Mono', 'Fira Code', 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+  }
+
+  /* Tabular numbers for alignment */
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Apply tabular-nums globally to elements that show numbers */
+  table, .data-grid, [class*="price"], [class*="volume"], [class*="amount"] {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Data grid styles */
+  .data-grid {
+    display: grid;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ============================================================================
+     CUSTOM SCROLLBARS - Thin, dark, minimal
+     ============================================================================ */
+
+  /* Firefox */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: #333333 #000000;
+  }
+
+  /* WebKit (Chrome, Safari, Edge) */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #000000;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background-color: #333333;
+    border-radius: 3px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: #444444;
+  }
+
+  /* Corner */
+  ::-webkit-scrollbar-corner {
+    background: #000000;
+  }
+
+  /* Legacy class for backwards compatibility */
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: #333333 #000000;
+  }
+
+  /* ============================================================================
+     BUTTONS & INTERACTIVE ELEMENTS
+     ============================================================================ */
+
+  /* Muted button style */
+  button, .btn {
+    background-color: #1a1a1a;
+    border: 1px solid #333333;
+    color: #999999;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
+  }
+
+  button:hover, .btn:hover {
+    background-color: #222222;
+    border-color: #444444;
+  }
+
+  button:active, .btn:active {
+    background-color: #111111;
+  }
+
+  button:focus, .btn:focus {
+    outline: none;
+    border-color: #555555;
+  }
+
+  /* Active/selected button state */
+  button.active, .btn.active {
+    background-color: #1a1a1a;
+    border-color: #00FF41;
+    color: #00FF41;
+  }
+
+  /* Custom focus styles */
+  input:focus, select:focus {
+    outline: none;
+    border-color: #444444;
+  }
+
+  /* ============================================================================
+     BORDERS & PANELS
+     ============================================================================ */
+
+  /* Override Tailwind's border colors to be darker */
+  .border-gray-700 {
+    border-color: #222222;
+  }
+
+  .border-gray-800 {
+    border-color: #1a1a1a;
+  }
+
+  .border-gray-900 {
+    border-color: #111111;
+  }
+
+  /* Panel backgrounds */
+  .bg-gray-800 {
+    background-color: #0a0a0a;
+  }
+
+  .bg-gray-900 {
+    background-color: #050505;
+  }
+
+  .bg-gray-950 {
+    background-color: #000000;
+  }
+
+  /* ============================================================================
+     ORDER BOOK HEATMAP - Using neon colors
+     ============================================================================ */
+
+  .heatmap-bid {
+    background: linear-gradient(to left, transparent, rgba(0, 255, 65, 0.15));
+  }
+
+  .heatmap-ask {
+    background: linear-gradient(to right, transparent, rgba(255, 69, 69, 0.15));
+  }
+
+  /* ============================================================================
+     ANIMATIONS - Minimal, no distracting effects
+     ============================================================================ */
+
+  /* Subtle fade for new elements */
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  .animate-fade-in {
+    animation: fade-in 0.15s ease-out;
+  }
+
+  /* Pulse animation for live indicator */
+  @keyframes pulse-ring {
+    0% {
+      transform: scale(0.8);
+      opacity: 1;
+    }
+    100% {
+      transform: scale(2);
+      opacity: 0;
+    }
+  }
+
+  .pulse-ring::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    animation: pulse-ring 1.5s ease-out infinite;
+  }
+
+  /* Loading skeleton */
+  @keyframes shimmer {
+    0% {
+      background-position: -200% 0;
+    }
+    100% {
+      background-position: 200% 0;
+    }
+  }
+
+  .skeleton {
+    background: linear-gradient(
+      90deg,
+      #111111 25%,
+      #222222 50%,
+      #111111 75%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+  }
+
+  /* ============================================================================
+     UTILITY CLASSES
+     ============================================================================ */
+
+  /* Glass morphism effects (updated for darker theme) */
+  .glass {
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(10px);
+    border: 1px solid #222222;
+  }
+
+  /* Gradient text */
+  .gradient-text {
+    background: linear-gradient(135deg, #00FF41, #00CC33);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Prevent text selection in interactive elements */
+  .no-select {
+    user-select: none;
+  }
+
+  /* Trade row base - no transitions for 60fps performance */
+  .trade-row {
+    background-color: transparent;
+  }
+
 }

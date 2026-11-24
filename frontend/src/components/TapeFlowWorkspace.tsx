@@ -603,30 +603,30 @@ export function TapeFlowWorkspace({ symbolData, pauseScroll }: TapeFlowWorkspace
   return (
     <div className="h-full w-full flex flex-col overflow-hidden" style={{ backgroundColor: 'var(--tf-bg-primary)' }}>
       {/* Workspace toolbar */}
-      <div className="flex-shrink-0 flex items-center justify-between px-2 py-1" style={{ backgroundColor: 'var(--tf-bg-secondary)', borderBottom: '1px solid var(--tf-border-primary)' }}>
+      <div className="shrink-0 flex items-center justify-between px-2 py-1" style={{ backgroundColor: 'var(--tf-bg-secondary)', borderBottom: '1px solid var(--tf-border-primary)' }}>
         <div className="flex items-center gap-2">
           <span className="text-xs font-mono uppercase" style={{ color: 'var(--tf-text-muted)' }}>Layout:</span>
           <button
             onClick={() => resetToPreset('default')}
-            className="px-2 py-0.5 text-xs font-mono rounded transition-colors tf-button"
+            className="px-2 py-0.5 text-xs font-mono rounded-sm transition-colors tf-button"
           >
             Default
           </button>
           <button
             onClick={() => resetToPreset('trading')}
-            className="px-2 py-0.5 text-xs font-mono rounded transition-colors tf-button"
+            className="px-2 py-0.5 text-xs font-mono rounded-sm transition-colors tf-button"
           >
             Trading
           </button>
           <button
             onClick={() => resetToPreset('analysis')}
-            className="px-2 py-0.5 text-xs font-mono rounded transition-colors tf-button"
+            className="px-2 py-0.5 text-xs font-mono rounded-sm transition-colors tf-button"
           >
             Analysis
           </button>
           <button
             onClick={() => resetToPreset('compact')}
-            className="px-2 py-0.5 text-xs font-mono rounded transition-colors tf-button"
+            className="px-2 py-0.5 text-xs font-mono rounded-sm transition-colors tf-button"
           >
             Compact
           </button>
@@ -637,20 +637,20 @@ export function TapeFlowWorkspace({ symbolData, pauseScroll }: TapeFlowWorkspace
           {/* Save/Load/Reset buttons */}
           <button
             onClick={() => setShowSaveDialog(true)}
-            className="px-2 py-0.5 text-xs font-mono rounded transition-colors tf-button text-green-400 hover:bg-green-900/30"
+            className="px-2 py-0.5 text-xs font-mono rounded-sm transition-colors tf-button text-green-400 hover:bg-green-900/30"
           >
             Save
           </button>
           <button
             onClick={() => setShowLoadDialog(true)}
-            className="px-2 py-0.5 text-xs font-mono rounded transition-colors tf-button text-blue-400 hover:bg-blue-900/30"
+            className="px-2 py-0.5 text-xs font-mono rounded-sm transition-colors tf-button text-blue-400 hover:bg-blue-900/30"
             disabled={savedLayouts.length === 0}
           >
             Load ({savedLayouts.length})
           </button>
           <button
             onClick={resetToFactory}
-            className="px-2 py-0.5 text-xs font-mono rounded transition-colors tf-button text-orange-400 hover:bg-orange-900/30"
+            className="px-2 py-0.5 text-xs font-mono rounded-sm transition-colors tf-button text-orange-400 hover:bg-orange-900/30"
           >
             ↺ Reset
           </button>
@@ -660,31 +660,31 @@ export function TapeFlowWorkspace({ symbolData, pauseScroll }: TapeFlowWorkspace
           <span className="text-xs font-mono" style={{ color: 'var(--tf-text-muted)' }}>+ Add Panel:</span>
           <button
             onClick={() => addPanel('footprint', 'Footprint')}
-            className="px-2 py-0.5 text-xs font-mono rounded transition-colors tf-button"
+            className="px-2 py-0.5 text-xs font-mono rounded-sm transition-colors tf-button"
           >
             Footprint
           </button>
           <button
             onClick={() => addPanel('cvd', 'CVD')}
-            className="px-2 py-0.5 text-xs font-mono rounded transition-colors tf-button"
+            className="px-2 py-0.5 text-xs font-mono rounded-sm transition-colors tf-button"
           >
             CVD
           </button>
           <button
             onClick={() => addPanel('profile', 'Volume Profile')}
-            className="px-2 py-0.5 text-xs font-mono rounded transition-colors tf-button"
+            className="px-2 py-0.5 text-xs font-mono rounded-sm transition-colors tf-button"
           >
             Profile
           </button>
           <button
             onClick={() => addPanel('dom', 'DOM')}
-            className="px-2 py-0.5 text-xs font-mono rounded transition-colors tf-button"
+            className="px-2 py-0.5 text-xs font-mono rounded-sm transition-colors tf-button"
           >
             DOM
           </button>
           <button
             onClick={() => addPanel('trading', 'Trading')}
-            className="px-2 py-0.5 text-xs font-mono rounded transition-colors tf-button"
+            className="px-2 py-0.5 text-xs font-mono rounded-sm transition-colors tf-button"
           >
             Trading
           </button>
@@ -701,21 +701,21 @@ export function TapeFlowWorkspace({ symbolData, pauseScroll }: TapeFlowWorkspace
               value={newLayoutName}
               onChange={(e) => setNewLayoutName(e.target.value)}
               placeholder="Enter layout name..."
-              className="w-full bg-black border border-gray-700 rounded px-3 py-2 text-sm font-mono text-white mb-3 focus:border-green-500 focus:outline-none"
+              className="w-full bg-black border border-gray-700 rounded-sm px-3 py-2 text-sm font-mono text-white mb-3 focus:border-green-500 focus:outline-hidden"
               autoFocus
               onKeyDown={(e) => e.key === 'Enter' && saveNamedLayout(newLayoutName)}
             />
             <div className="flex gap-2 justify-end">
               <button
                 onClick={() => { setShowSaveDialog(false); setNewLayoutName(''); }}
-                className="px-3 py-1.5 text-xs font-mono rounded bg-gray-800 hover:bg-gray-700 text-gray-400"
+                className="px-3 py-1.5 text-xs font-mono rounded-sm bg-gray-800 hover:bg-gray-700 text-gray-400"
               >
                 Cancel
               </button>
               <button
                 onClick={() => saveNamedLayout(newLayoutName)}
                 disabled={!newLayoutName.trim()}
-                className="px-3 py-1.5 text-xs font-mono rounded bg-green-600 hover:bg-green-500 text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-3 py-1.5 text-xs font-mono rounded-sm bg-green-600 hover:bg-green-500 text-white disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Save
               </button>
@@ -734,7 +734,7 @@ export function TapeFlowWorkspace({ symbolData, pauseScroll }: TapeFlowWorkspace
                 <p className="text-gray-500 text-sm font-mono text-center py-4">No saved layouts</p>
               ) : (
                 savedLayouts.map((layout) => (
-                  <div key={layout.name} className="flex items-center justify-between bg-gray-800 rounded px-3 py-2 group hover:bg-gray-700">
+                  <div key={layout.name} className="flex items-center justify-between bg-gray-800 rounded-sm px-3 py-2 group hover:bg-gray-700">
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-mono text-white truncate">{layout.name}</p>
                       <p className="text-[10px] font-mono text-gray-500">
@@ -744,20 +744,20 @@ export function TapeFlowWorkspace({ symbolData, pauseScroll }: TapeFlowWorkspace
                     <div className="flex items-center gap-1 ml-2">
                       <button
                         onClick={() => loadNamedLayout(layout)}
-                        className="px-2 py-1 text-xs font-mono rounded bg-blue-600 hover:bg-blue-500 text-white"
+                        className="px-2 py-1 text-xs font-mono rounded-sm bg-blue-600 hover:bg-blue-500 text-white"
                       >
                         Load
                       </button>
                       <button
                         onClick={() => setAsDefault(layout)}
-                        className="px-2 py-1 text-xs font-mono rounded bg-yellow-600 hover:bg-yellow-500 text-black"
+                        className="px-2 py-1 text-xs font-mono rounded-sm bg-yellow-600 hover:bg-yellow-500 text-black"
                         title="Set as default"
                       >
                         Default
                       </button>
                       <button
                         onClick={() => deleteNamedLayout(layout.name)}
-                        className="px-2 py-1 text-xs font-mono rounded bg-red-600 hover:bg-red-500 text-white"
+                        className="px-2 py-1 text-xs font-mono rounded-sm bg-red-600 hover:bg-red-500 text-white"
                       >
                         ✕
                       </button>
@@ -769,7 +769,7 @@ export function TapeFlowWorkspace({ symbolData, pauseScroll }: TapeFlowWorkspace
             <div className="flex justify-end mt-3 pt-3 border-t border-gray-700">
               <button
                 onClick={() => setShowLoadDialog(false)}
-                className="px-3 py-1.5 text-xs font-mono rounded bg-gray-800 hover:bg-gray-700 text-gray-400"
+                className="px-3 py-1.5 text-xs font-mono rounded-sm bg-gray-800 hover:bg-gray-700 text-gray-400"
               >
                 Close
               </button>

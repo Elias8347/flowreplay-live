@@ -3,7 +3,8 @@
 
 const AGG_TRADES_URL = 'https://fapi.binance.com/fapi/v1/aggTrades';
 const PAGE_SIZE = 1000;
-const MAX_PAGES = 40;
+// At most half the per-minute budget per load, so switching markets right after still works
+const MAX_PAGES = 15;
 const PAGE_DELAY_MS = 50;
 const MAX_WINDOW_MS = 60 * 60_000;
 const MAX_CACHED_SYMBOLS = 6;
@@ -59,8 +60,22 @@ export function firstIndexAtOrAfter(rows: TapeRow[], time: number): number {
   return low;
 }
 
+// Binance allows 2,400 request weight per minute per IP, and each trade page costs 20.
+// Stay well under that so busy markets return partial history instead of getting the IP blocked.
+const PAGES_PER_MINUTE = 30;
+const BACK_OFF_ABOVE_WEIGHT = 1500;
+const pageTimes: number[] = [];
+
+function takePageBudget() {
+  const now = Date.now();
+  while (pageTimes.length && pageTimes[0] < now - 60_000) pageTimes.shift();
+  if (pageTimes.length >= PAGES_PER_MINUTE) throw new UpstreamLimitError('Local Binance request budget used up for this minute');
+  pageTimes.push(now);
+}
+
 async function fetchPage(symbol: string, fromId?: number): Promise<AggTrade[]> {
   if (Date.now() < cooldownUntil) throw new UpstreamLimitError('Binance rate limit cooldown');
+  takePageBudget();
   const url = new URL(AGG_TRADES_URL);
   url.searchParams.set('symbol', symbol);
   url.searchParams.set('limit', String(PAGE_SIZE));
@@ -73,15 +88,21 @@ async function fetchPage(symbol: string, fromId?: number): Promise<AggTrade[]> {
     throw new UpstreamLimitError(`Binance rate limit, retry in ${retryAfter}s`);
   }
   if (!response.ok) throw new Error(`Binance returned HTTP ${response.status}`);
+  // Back off for the rest of the minute when the IP's shared weight is getting high
+  const usedWeight = Number(response.headers.get('x-mbx-used-weight-1m'));
+  if (usedWeight > BACK_OFF_ABOVE_WEIGHT) cooldownUntil = Math.ceil(Date.now() / 60_000) * 60_000;
   const page = await response.json();
   if (!Array.isArray(page)) throw new Error('Unexpected response from Binance');
   return page;
 }
 
-/** Walks backward by trade ID so that a capped result always keeps the newest trades. */
-async function rebuild(symbol: string, cutoff: number): Promise<CacheEntry & { complete: boolean }> {
+/**
+ * Walks backward by trade ID so that a capped result always keeps the newest trades.
+ * With `beforeId`, it extends an existing cache further back instead of starting from now.
+ */
+async function rebuild(symbol: string, cutoff: number, beforeId: number | null = null): Promise<CacheEntry & { complete: boolean }> {
   const pages: TapeRow[][] = [];
-  let firstId: number | null = null;
+  let firstId: number | null = beforeId;
   let reachedCutoff = false;
 
   try {
@@ -139,8 +160,19 @@ async function loadTape(symbol: string, windowMs: number): Promise<TapeResult> {
   let complete: boolean;
 
   const newest = entry?.rows[entry.rows.length - 1]?.[1] ?? 0;
-  if (entry && entry.rows.length > 0 && entry.coveredFrom <= cutoff && now - newest <= MAX_TOP_UP_AGE_MS) {
-    complete = await topUp(symbol, entry);
+  if (entry && entry.rows.length > 0 && now - newest <= MAX_TOP_UP_AGE_MS) {
+    const caughtUp = await topUp(symbol, entry);
+    // A partial cache grows further back with each request, as the request budget allows
+    if (entry.coveredFrom > cutoff) {
+      try {
+        const older = await rebuild(symbol, cutoff, entry.rows[0][0]);
+        entry.rows = [...older.rows, ...entry.rows];
+        entry.coveredFrom = older.complete ? cutoff : older.rows[0]?.[1] ?? entry.coveredFrom;
+      } catch (error) {
+        console.warn(`[History] Could not extend ${symbol}: ${(error as Error).message}`);
+      }
+    }
+    complete = caughtUp && entry.coveredFrom <= cutoff;
   } else {
     const rebuilt = await rebuild(symbol, cutoff);
     complete = rebuilt.complete;
@@ -185,4 +217,13 @@ export function getTapeHistory(symbol: string, minutes: number): Promise<TapeRes
 
 export function isHistoryRateLimit(error: unknown): boolean {
   return error instanceof UpstreamLimitError;
+}
+
+/** Seconds until history requests can succeed again. */
+export function historyRetryAfterSeconds(): number {
+  const now = Date.now();
+  if (now < cooldownUntil) return Math.ceil((cooldownUntil - now) / 1000);
+  while (pageTimes.length && pageTimes[0] < now - 60_000) pageTimes.shift();
+  if (pageTimes.length >= PAGES_PER_MINUTE) return Math.ceil((pageTimes[0] + 60_000 - now) / 1000) + 1;
+  return 1;
 }

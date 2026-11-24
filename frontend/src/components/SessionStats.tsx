@@ -297,12 +297,12 @@ export const SessionStats = memo(function SessionStats({
   
   return (
     <div className={cn(
-      "bg-black rounded border border-gray-800 overflow-hidden font-mono flex flex-col",
+      "bg-black rounded-sm border border-gray-800 overflow-hidden font-mono flex flex-col",
       className
     )}>
       {/* Header */}
       <div 
-        className="flex items-center justify-between p-2 border-b border-gray-800 cursor-pointer hover:bg-gray-900/50 transition-colors flex-shrink-0"
+        className="flex items-center justify-between p-2 border-b border-gray-800 cursor-pointer hover:bg-gray-900/50 transition-colors shrink-0"
         onClick={() => setIsExpanded(!isExpanded)}
       >
         <div className="flex items-center gap-2">
@@ -390,7 +390,7 @@ export const SessionStats = memo(function SessionStats({
             </div>
             
             {/* Buy/Sell ratio bar */}
-            <div className="mt-1 h-2 bg-gray-900 rounded overflow-hidden flex">
+            <div className="mt-1 h-2 bg-gray-900 rounded-sm overflow-hidden flex">
               <div 
                 className="h-full bg-[#00FF41]/60 transition-all duration-300"
                 style={{ width: `${stats.buyRatio}%` }}
@@ -502,7 +502,7 @@ export const SessionStats = memo(function SessionStats({
                 <div 
                   key={trade.id || i}
                   className={cn(
-                    "flex items-center justify-between py-0.5 px-1 rounded text-[10px]",
+                    "flex items-center justify-between py-0.5 px-1 rounded-sm text-[10px]",
                     trade.side === 'buy' ? "bg-[#00FF41]/5" : "bg-[#FF4545]/5"
                   )}
                 >

@@ -67,7 +67,7 @@ const HOTKEY_GROUPS: HotkeyGroup[] = [
 
 const KeyBadge = memo(function KeyBadge({ children }: { children: string }) {
   return (
-    <kbd className="px-1.5 py-0.5 bg-gray-800 border border-gray-700 rounded text-[10px] font-mono text-gray-300 min-w-[24px] text-center">
+    <kbd className="px-1.5 py-0.5 bg-gray-800 border border-gray-700 rounded-sm text-[10px] font-mono text-gray-300 min-w-[24px] text-center">
       {children}
     </kbd>
   );
@@ -96,7 +96,7 @@ export const HotkeysPanel = memo(function HotkeysPanel({ isOpen, onClose }: Hotk
 
   return (
     <div 
-      className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-[100]"
+      className="fixed inset-0 bg-black/80 backdrop-blur-xs flex items-center justify-center z-100"
       onClick={onClose}
     >
       <div 

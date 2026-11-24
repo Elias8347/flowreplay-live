@@ -50,7 +50,7 @@ function NewsItemComponent({ article, compact: _compact }: { article: NewsArticl
       <div className="flex items-start gap-2.5">
         {/* Sentiment badge */}
         <span className={cn(
-          "px-1.5 py-0.5 text-[10px] rounded border font-semibold flex-shrink-0 mt-0.5",
+          "px-1.5 py-0.5 text-[10px] rounded-sm border font-semibold shrink-0 mt-0.5",
           sentiment.className
         )}>
           {sentiment.text}
@@ -180,12 +180,12 @@ export const NewsFeed = memo(function NewsFeed({
   
   return (
     <div className={cn(
-      "bg-black rounded border border-gray-800 overflow-hidden font-mono flex flex-col h-full",
+      "bg-black rounded-sm border border-gray-800 overflow-hidden font-mono flex flex-col h-full",
       className
     )}>
       {/* Header */}
       <div 
-        className="flex items-center justify-between px-3 py-2 border-b border-gray-800 bg-gray-900/30 flex-shrink-0"
+        className="flex items-center justify-between px-3 py-2 border-b border-gray-800 bg-gray-900/30 shrink-0"
       >
         <div className="flex items-center gap-2">
           <span className="text-xs text-blue-400 font-semibold uppercase tracking-wider">NEWS</span>
@@ -193,7 +193,7 @@ export const NewsFeed = memo(function NewsFeed({
             {symbol.toUpperCase()}
           </span>
           {articles.length > 0 && (
-            <span className="px-1.5 py-0.5 text-[10px] bg-gray-800 text-gray-400 rounded">
+            <span className="px-1.5 py-0.5 text-[10px] bg-gray-800 text-gray-400 rounded-sm">
               {articles.length}
             </span>
           )}

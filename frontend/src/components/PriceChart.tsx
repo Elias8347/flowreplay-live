@@ -221,7 +221,7 @@ export function PriceChart({
   if (data.length < 2) {
     return (
       <div
-        className={`flex items-center justify-center bg-black border border-gray-800 rounded ${className}`}
+        className={`flex items-center justify-center bg-black border border-gray-800 rounded-sm ${className}`}
         style={{ width, height }}
       >
         <span className="text-gray-600 font-mono text-sm">Waiting for data...</span>
@@ -232,7 +232,7 @@ export function PriceChart({
   return (
     <canvas
       ref={canvasRef}
-      className={`bg-black rounded ${className}`}
+      className={`bg-black rounded-sm ${className}`}
       style={{ width, height }}
     />
   );

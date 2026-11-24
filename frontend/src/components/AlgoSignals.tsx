@@ -302,7 +302,7 @@ export const AlgoSignals = memo(function AlgoSignals({
       titan: { bg: 'bg-cyan-500/20', text: 'text-cyan-400', label: 'TITAN' },
     };
     const s = styles[type] || { bg: 'bg-gray-500/20', text: 'text-gray-400', label: 'INFO' };
-    return <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${s.bg} ${s.text} border border-current/30`}>{s.label}</span>;
+    return <span className={`px-1.5 py-0.5 rounded-sm text-[10px] font-bold ${s.bg} ${s.text} border border-current/30`}>{s.label}</span>;
   };
 
   // Convert Titan alerts to AlgoSignal format for unified display

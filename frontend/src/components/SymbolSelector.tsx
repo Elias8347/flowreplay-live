@@ -106,7 +106,7 @@ export function SymbolSelector({ onClose }: SymbolSelectorProps) {
               className={cn(
                 "w-full bg-gray-800 text-white px-4 py-3 rounded-lg",
                 "border border-gray-700 focus:border-blue-500 focus:ring-1 focus:ring-blue-500",
-                "outline-none transition-colors placeholder:text-gray-500"
+                "outline-hidden transition-colors placeholder:text-gray-500"
               )}
               disabled={!isConnected}
             />
@@ -130,7 +130,7 @@ export function SymbolSelector({ onClose }: SymbolSelectorProps) {
                     <span className="text-white font-medium">{validationResult.symbol}</span>
                     <span className="text-gray-400 ml-2">{validationResult.name}</span>
                   </div>
-                  <span className={cn("px-2 py-0.5 rounded text-xs", getAssetTypeColor(validationResult.assetType))}>
+                  <span className={cn("px-2 py-0.5 rounded-sm text-xs", getAssetTypeColor(validationResult.assetType))}>
                     {validationResult.assetType.toUpperCase()}
                   </span>
                 </div>

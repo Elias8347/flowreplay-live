@@ -139,7 +139,7 @@ export function Tooltip({
       {isVisible && (
         <div
           ref={tooltipRef}
-          className="fixed z-[9999] px-3 py-2 rounded-lg text-xs shadow-xl animate-in fade-in-0 zoom-in-95 duration-150"
+          className="fixed z-9999 px-3 py-2 rounded-lg text-xs shadow-xl animate-in fade-in-0 zoom-in-95 duration-150"
           style={{
             left: coords.x,
             top: coords.y,

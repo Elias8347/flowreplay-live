@@ -215,7 +215,7 @@ export function DashboardLayout() {
   return (
     <div className="h-screen flex flex-col tf-bg-primary text-white overflow-hidden" style={{ backgroundColor: 'var(--tf-bg-primary)' }}>
       {/* Persistent Top Navigation - Always visible, z-index 100 to stay above flexlayout */}
-      <header className="flex-shrink-0 border-b px-3 py-1.5 relative z-[100]" style={{ backgroundColor: 'var(--tf-bg-secondary)', borderColor: 'var(--tf-border-primary)' }}>
+      <header className="shrink-0 border-b px-3 py-1.5 relative z-100" style={{ backgroundColor: 'var(--tf-bg-secondary)', borderColor: 'var(--tf-border-primary)' }}>
         <div className="flex items-center justify-between">
           {/* Left: Logo + Symbol Selector + Status */}
           <div className="flex items-center gap-3">
@@ -229,7 +229,7 @@ export function DashboardLayout() {
             <RealTimeClock />
 
             <div className={cn(
-              "flex items-center gap-1.5 px-2 py-0.5 rounded text-xs font-mono",
+              "flex items-center gap-1.5 px-2 py-0.5 rounded-sm text-xs font-mono",
               dataMode === 'SIM' 
                 ? (simConnected ? "text-[#A855F7]" : "text-gray-500")
                 : (isConnected ? "" : "")
@@ -282,7 +282,7 @@ export function DashboardLayout() {
             <button
               onClick={() => updateSettings({ pauseScroll: !settings.pauseScroll })}
               className={cn(
-                "p-1.5 rounded border transition-colors",
+                "p-1.5 rounded-sm border transition-colors",
                 settings.pauseScroll
                   ? ""
                   : "text-gray-600 hover:text-gray-400"
@@ -300,7 +300,7 @@ export function DashboardLayout() {
 
             <button
               onClick={() => clearTrades()}
-              className="p-1.5 rounded border text-gray-600 hover:text-gray-400 transition-colors"
+              className="p-1.5 rounded-sm border text-gray-600 hover:text-gray-400 transition-colors"
               style={{ borderColor: 'var(--tf-border-primary)' }}
               title="Clear trades"
             >
@@ -309,7 +309,7 @@ export function DashboardLayout() {
 
             <button
               onClick={() => setShowSettings(!showSettings)}
-              className="p-1.5 rounded border text-gray-600 hover:text-gray-400 transition-colors"
+              className="p-1.5 rounded-sm border text-gray-600 hover:text-gray-400 transition-colors"
               style={{ borderColor: 'var(--tf-border-primary)' }}
               title="Settings"
             >
@@ -318,7 +318,7 @@ export function DashboardLayout() {
 
             <button
               onClick={() => setShowHotkeys(true)}
-              className="p-1.5 rounded border text-gray-600 hover:text-gray-400 transition-colors"
+              className="p-1.5 rounded-sm border text-gray-600 hover:text-gray-400 transition-colors"
               style={{ borderColor: 'var(--tf-border-primary)' }}
               title="Keyboard Shortcuts (?)"
             >
@@ -328,7 +328,7 @@ export function DashboardLayout() {
             <button
               onClick={() => setShowAlerts(true)}
               className={cn(
-                "p-1.5 rounded border transition-colors",
+                "p-1.5 rounded-sm border transition-colors",
                 showAlerts
                   ? "border-[#00FF41] text-[#00FF41]"
                   : "text-gray-600 hover:text-gray-400"
@@ -341,7 +341,7 @@ export function DashboardLayout() {
 
             <button
               onClick={() => setShowSymbolSelector(true)}
-              className="flex items-center gap-1 px-2 py-1 rounded font-mono text-xs transition-colors"
+              className="flex items-center gap-1 px-2 py-1 rounded-sm font-mono text-xs transition-colors"
               style={{ 
                 backgroundColor: 'var(--tf-bg-primary)',
                 borderWidth: '1px',
@@ -374,7 +374,7 @@ export function DashboardLayout() {
               </p>
               <button
                 onClick={() => setShowSymbolSelector(true)}
-                className="flex items-center gap-2 px-4 py-2 rounded font-mono text-sm transition-colors mx-auto"
+                className="flex items-center gap-2 px-4 py-2 rounded-sm font-mono text-sm transition-colors mx-auto"
                 style={{ 
                   backgroundColor: 'var(--tf-bg-primary)',
                   border: `1px solid ${accentColor}`,
@@ -410,13 +410,13 @@ export function DashboardLayout() {
 
       {/* Modals */}
       {showSymbolSelector && (
-        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 backdrop-blur-sm">
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 backdrop-blur-xs">
           <SymbolSelector onClose={() => setShowSymbolSelector(false)} />
         </div>
       )}
 
       {showSettings && (
-        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 backdrop-blur-sm">
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 backdrop-blur-xs">
           <SettingsPanel onClose={() => setShowSettings(false)} />
         </div>
       )}

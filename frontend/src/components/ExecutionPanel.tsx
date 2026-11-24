@@ -90,7 +90,7 @@ function OrderEntryForm({
           type="button"
           onClick={() => setSide('buy')}
           className={cn(
-            "py-2 rounded text-sm font-bold transition-colors",
+            "py-2 rounded-sm text-sm font-bold transition-colors",
             side === 'buy' 
               ? "bg-[#00FF41] text-black" 
               : "bg-gray-800 text-[#00FF41] border border-[#00FF41]/30 hover:bg-[#00FF41]/10"
@@ -102,7 +102,7 @@ function OrderEntryForm({
           type="button"
           onClick={() => setSide('sell')}
           className={cn(
-            "py-2 rounded text-sm font-bold transition-colors",
+            "py-2 rounded-sm text-sm font-bold transition-colors",
             side === 'sell' 
               ? "bg-[#FF4545] text-black" 
               : "bg-gray-800 text-[#FF4545] border border-[#FF4545]/30 hover:bg-[#FF4545]/10"
@@ -120,7 +120,7 @@ function OrderEntryForm({
             type="button"
             onClick={() => setOrderType(type)}
             className={cn(
-              "flex-1 py-1 rounded text-xs font-mono transition-colors",
+              "flex-1 py-1 rounded-sm text-xs font-mono transition-colors",
               orderType === type 
                 ? "bg-gray-700 text-white" 
                 : "bg-gray-900 text-gray-500 hover:text-gray-300"
@@ -140,7 +140,7 @@ function OrderEntryForm({
           onChange={(e) => setQuantity(e.target.value)}
           step="0.001"
           min="0"
-          className="w-full px-2 py-1.5 bg-gray-900 border border-gray-700 rounded text-sm font-mono text-white focus:border-[#00FF41] focus:outline-none"
+          className="w-full px-2 py-1.5 bg-gray-900 border border-gray-700 rounded-sm text-sm font-mono text-white focus:border-[#00FF41] focus:outline-hidden"
         />
       </div>
       
@@ -155,7 +155,7 @@ function OrderEntryForm({
             placeholder={formatPrice(currentPrice)}
             step="0.01"
             min="0"
-            className="w-full px-2 py-1.5 bg-gray-900 border border-gray-700 rounded text-sm font-mono text-white focus:border-[#00FF41] focus:outline-none"
+            className="w-full px-2 py-1.5 bg-gray-900 border border-gray-700 rounded-sm text-sm font-mono text-white focus:border-[#00FF41] focus:outline-hidden"
           />
         </div>
       )}
@@ -170,7 +170,7 @@ function OrderEntryForm({
       <button
         type="submit"
         className={cn(
-          "w-full py-2 rounded text-sm font-bold transition-colors",
+          "w-full py-2 rounded-sm text-sm font-bold transition-colors",
           side === 'buy'
             ? "bg-[#00FF41] text-black hover:bg-[#00DD35]"
             : "bg-[#FF4545] text-black hover:bg-[#DD3535]"
@@ -205,7 +205,7 @@ function PositionDisplay({
   
   return (
     <div className={cn(
-      "p-2 rounded border",
+      "p-2 rounded-sm border",
       isLong ? "border-[#00FF41]/30 bg-[#00FF41]/5" : "border-[#FF4545]/30 bg-[#FF4545]/5"
     )}>
       <div className="flex items-center justify-between mb-2">
@@ -217,7 +217,7 @@ function PositionDisplay({
         </span>
         <button
           onClick={onFlatten}
-          className="px-2 py-0.5 bg-gray-800 hover:bg-gray-700 rounded text-xs text-gray-400 hover:text-white transition-colors"
+          className="px-2 py-0.5 bg-gray-800 hover:bg-gray-700 rounded-sm text-xs text-gray-400 hover:text-white transition-colors"
         >
           FLATTEN
         </button>
@@ -267,7 +267,7 @@ function OpenOrdersList({
       {orders.map(order => (
         <div 
           key={order.id}
-          className="flex items-center justify-between p-1.5 bg-gray-900 rounded text-xs"
+          className="flex items-center justify-between p-1.5 bg-gray-900 rounded-sm text-xs"
         >
           <div className="flex items-center gap-2">
             <span className={cn(
@@ -386,17 +386,17 @@ export const ExecutionPanel = memo(function ExecutionPanel({
   
   return (
     <div className={cn(
-      "bg-black rounded border border-gray-800 overflow-hidden font-mono flex flex-col",
+      "bg-black rounded-sm border border-gray-800 overflow-hidden font-mono flex flex-col",
       className
     )}>
       {/* Header with Account Summary */}
-      <div className="p-2 border-b border-gray-800 flex-shrink-0">
+      <div className="p-2 border-b border-gray-800 shrink-0">
         <div className="flex items-center justify-between mb-2">
           <span className="text-xs text-orange-500 uppercase">&gt;&gt; PAPER TRADING</span>
           <button
             onClick={() => setEnabled(!enabled)}
             className={cn(
-              "px-2 py-0.5 rounded text-[10px] font-bold transition-colors",
+              "px-2 py-0.5 rounded-sm text-[10px] font-bold transition-colors",
               enabled 
                 ? "bg-[#00FF41]/20 text-[#00FF41] border border-[#00FF41]/30" 
                 : "bg-gray-800 text-gray-500 hover:text-white"
@@ -434,7 +434,7 @@ export const ExecutionPanel = memo(function ExecutionPanel({
       </div>
       
       {/* Tab Bar */}
-      <div className="flex border-b border-gray-800 flex-shrink-0">
+      <div className="flex border-b border-gray-800 shrink-0">
         {[
           { id: 'order', label: 'ORDER' },
           { id: 'orders', label: `OPEN (${symbolOrders.length})` },
@@ -519,12 +519,12 @@ export const ExecutionPanel = memo(function ExecutionPanel({
       </div>
       
       {/* Footer with Quick Actions */}
-      <div className="p-2 border-t border-gray-800 flex gap-2 flex-shrink-0">
+      <div className="p-2 border-t border-gray-800 flex gap-2 shrink-0">
         <button
           onClick={() => flattenPosition(symbol)}
           disabled={!position || position.side === 'flat'}
           className={cn(
-            "flex-1 py-1.5 rounded text-xs font-bold transition-colors",
+            "flex-1 py-1.5 rounded-sm text-xs font-bold transition-colors",
             position && position.side !== 'flat'
               ? "bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 hover:bg-yellow-500/30"
               : "bg-gray-900 text-gray-600 cursor-not-allowed"
@@ -536,7 +536,7 @@ export const ExecutionPanel = memo(function ExecutionPanel({
           onClick={() => symbolOrders.forEach(o => cancelOrder(o.id))}
           disabled={symbolOrders.length === 0}
           className={cn(
-            "flex-1 py-1.5 rounded text-xs font-bold transition-colors",
+            "flex-1 py-1.5 rounded-sm text-xs font-bold transition-colors",
             symbolOrders.length > 0
               ? "bg-[#FF4545]/20 text-[#FF4545] border border-[#FF4545]/30 hover:bg-[#FF4545]/30"
               : "bg-gray-900 text-gray-600 cursor-not-allowed"

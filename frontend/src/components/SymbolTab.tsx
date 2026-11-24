@@ -81,14 +81,14 @@ export function SymbolTab({
       onClick={onClick}
       onKeyDown={handleKeyDown}
       className={cn(
-        "group flex items-center gap-2 px-3 py-1.5 rounded border transition-all font-mono text-sm cursor-pointer",
+        "group flex items-center gap-2 px-3 py-1.5 rounded-sm border transition-all font-mono text-sm cursor-pointer",
         isActive
           ? "bg-black border-[#00FF41] text-[#00FF41]"
           : "bg-black border-gray-800 text-gray-500 hover:text-gray-300 hover:border-gray-700"
       )}
     >
       <div className="flex items-center gap-2">
-        <span className={cn("text-xs px-1 py-0.5 rounded", getAssetTypeColor(assetType))}>
+        <span className={cn("text-xs px-1 py-0.5 rounded-sm", getAssetTypeColor(assetType))}>
           {assetType.slice(0, 1).toUpperCase()}
         </span>
         <span className="font-medium">{symbol}</span>

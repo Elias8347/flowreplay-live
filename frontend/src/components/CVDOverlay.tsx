@@ -298,7 +298,7 @@ export const CVDOverlay = memo(function CVDOverlay({
   const isPositive = stats.current >= 0;
 
   return (
-    <div className={cn("flex flex-col bg-black border border-gray-800 rounded overflow-hidden", className)}>
+    <div className={cn("flex flex-col bg-black border border-gray-800 rounded-sm overflow-hidden", className)}>
       {/* Header */}
       <div className="flex items-center justify-between px-2 py-1.5 border-b border-gray-800 bg-gray-900/30">
         <span className="text-xs font-mono font-semibold text-cyan-500 tracking-wider">
@@ -312,7 +312,7 @@ export const CVDOverlay = memo(function CVDOverlay({
           {/* Reset button */}
           <button
             onClick={handleReset}
-            className="px-1.5 py-0.5 text-[9px] font-mono text-gray-500 hover:text-white border border-gray-700 hover:border-gray-500 rounded transition-colors"
+            className="px-1.5 py-0.5 text-[9px] font-mono text-gray-500 hover:text-white border border-gray-700 hover:border-gray-500 rounded-sm transition-colors"
             title="Reset CVD to zero"
           >
             RESET

@@ -6,7 +6,8 @@ import { WebSocketServer, WebSocket } from 'ws';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import { MfpAdapter, NewsAdapter } from './adapters';
-import { getTapeHistory, isHistoryRateLimit } from './history';
+import { getTapeHistory, historyRetryAfterSeconds, isHistoryRateLimit } from './history';
+import { CANDLE_INTERVALS, getCandles, type CandleInterval } from './candles';
 import { Trade, OrderBook, Ticker, ClientMessage, ServerMessage } from './types';
 
 dotenv.config();
@@ -479,7 +480,7 @@ app.get('/api/mfp/markets', async (_req, res) => {
   try {
     const adapter = await initMarketAdapter();
     await adapter.validateSymbol('BTCUSDT');
-    res.json({ symbols: adapter.getSupportedSymbols(), coverage: adapter.getCoverage() });
+    res.json({ symbols: adapter.getSupportedSymbols(), leverage: adapter.getLeverage(), coverage: adapter.getCoverage() });
   } catch (error: any) {
     console.error('[MFP] Market list error:', error.message);
     res.status(502).json({ error: 'Failed to load MFP markets' });
@@ -528,6 +529,34 @@ app.get('/api/binance/klines', async (req, res) => {
   await proxyFutures(req, res, 'klines', { symbol, interval, limit: String(limit) });
 });
 
+// Recent candles with exact bar delta, so the chart can draw immediately while the tape loads
+app.get('/api/mfp/candles', async (req, res) => {
+  const clientIp = req.ip || req.socket.remoteAddress || 'unknown';
+  if (!checkRateLimit(`${clientIp}:candles`)) {
+    res.status(429).json({ error: 'Rate limit exceeded' });
+    return;
+  }
+  const symbol = validateSymbol(req.query.symbol);
+  const interval = req.query.interval as CandleInterval;
+  if (!symbol || !CANDLE_INTERVALS.includes(interval)) {
+    res.status(400).json({ error: 'Invalid symbol or interval' });
+    return;
+  }
+  const limit = Math.min(Math.max(1, parseInt(req.query.limit as string) || 360), 1000);
+  try {
+    const adapter = await initMarketAdapter();
+    const market = await adapter.validateSymbol(symbol);
+    if (!market.valid) {
+      res.status(422).json({ error: market.error });
+      return;
+    }
+    res.json({ symbol, interval, source: 'binance-perpetual', candles: await getCandles(symbol, interval, limit) });
+  } catch (error: any) {
+    console.error(`[Candles] ${symbol} error:`, error.message);
+    res.status(502).json({ error: 'Candles are unavailable right now' });
+  }
+});
+
 // Exact recent tape for MFP's Binance-sourced markets, rebuilt from the public venue history
 app.get('/api/mfp/history', async (req, res) => {
   const clientIp = req.ip || req.socket.remoteAddress || 'unknown';
@@ -551,6 +580,7 @@ app.get('/api/mfp/history', async (req, res) => {
     res.json(await getTapeHistory(symbol, minutes));
   } catch (error: any) {
     console.error(`[History] ${symbol} error:`, error.message);
+    if (isHistoryRateLimit(error)) res.setHeader('Retry-After', String(historyRetryAfterSeconds()));
     res.status(isHistoryRateLimit(error) ? 503 : 502).json({ error: 'Trade history is unavailable right now' });
   }
 });

@@ -91,7 +91,7 @@ interface OrderBookProps {
 
 // Memoized heatmap bar for perf
 const HeatmapBar = memo(function HeatmapBar({ intensity, side }: { intensity: number; side: 'bid' | 'ask' }) {
-  const color = side === 'bid' ? 'bg-[#00FF41]' : 'bg-[#FF4545]';
+  const color = side === 'bid' ? 'bg-buy' : 'bg-sell';
   return (
     <div 
       className={cn("absolute top-0 bottom-0", color, side === 'bid' ? 'right-0' : 'left-0')}
@@ -120,17 +120,17 @@ const OrderBookRow = memo(function OrderBookRow({
   const isBid = side === 'bid';
   
   return (
-    <div className="relative grid grid-cols-2 gap-0.5 px-0.5 py-0.5 text-[10px] font-mono hover:bg-gray-900/50 overflow-hidden">
+    <div className="relative grid grid-cols-2 gap-0.5 px-0.5 py-0.5 text-[10px] font-mono hover:bg-surface-hover overflow-hidden">
       {showHeatmap && <HeatmapBar intensity={intensity} side={side} />}
       {isBid ? (
         <>
-          <span className="text-left text-gray-400 relative z-10 tabular-nums truncate">{formatOrderBookSize(level.size)}</span>
-          <span className="text-right text-[#00FF41] font-medium relative z-10 tabular-nums truncate">{formatPrice(level.price, assetType)}</span>
+          <span className="text-left text-text-secondary relative z-10 tabular-nums truncate">{formatOrderBookSize(level.size)}</span>
+          <span className="text-right text-buy font-medium relative z-10 tabular-nums truncate">{formatPrice(level.price, assetType)}</span>
         </>
       ) : (
         <>
-          <span className="text-left text-[#FF4545] font-medium relative z-10 tabular-nums truncate">{formatPrice(level.price, assetType)}</span>
-          <span className="text-right text-gray-400 relative z-10 tabular-nums truncate">{formatOrderBookSize(level.size)}</span>
+          <span className="text-left text-sell font-medium relative z-10 tabular-nums truncate">{formatPrice(level.price, assetType)}</span>
+          <span className="text-right text-text-secondary relative z-10 tabular-nums truncate">{formatOrderBookSize(level.size)}</span>
         </>
       )}
     </div>
@@ -157,17 +157,17 @@ const OrderBookSide = memo(function OrderBookSide({
   return (
     <div className="flex-1 min-w-0 overflow-hidden">
       <div className={cn(
-        "grid grid-cols-2 gap-0.5 px-0.5 py-1 text-[9px] font-mono uppercase tracking-wider border-b border-gray-800",
-        isBid ? "text-[#00FF41]" : "text-[#FF4545]"
+        "grid grid-cols-2 gap-0.5 px-1 py-1.5 font-sans text-[10.5px] border-b border-line",
+        isBid ? "text-buy" : "text-sell"
       )}>
         {isBid ? (
-          <><span className="text-left truncate">SIZE</span><span className="text-right truncate">BID</span></>
+          <><span className="text-left truncate text-muted-foreground">Size</span><span className="text-right truncate">Bid</span></>
         ) : (
-          <><span className="text-left truncate">ASK</span><span className="text-right truncate">SIZE</span></>
+          <><span className="text-left truncate">Ask</span><span className="text-right truncate text-muted-foreground">Size</span></>
         )}
       </div>
       
-      <div className="divide-y divide-gray-900/30">
+      <div className="divide-y divide-line-subtle">
         {levels.map((level) => (
           <OrderBookRow
             key={`${side}-${level.price.toFixed(8)}`}
@@ -503,29 +503,29 @@ export function OrderBook({
     const status = statusMessages[hydrationState];
     
     return (
-      <div className="flex items-center justify-center h-64 text-gray-600 bg-black">
+      <div className="flex items-center justify-center h-64 text-muted-foreground bg-surface-panel">
         <div className="text-center font-mono">
           <div className="text-2xl mb-2 animate-pulse">{status.icon}</div>
-          <p className="text-sm text-[#00FF41]">&gt; {status.text}</p>
-          {symbol && <p className="text-xs text-gray-700 mt-1">{symbol.toUpperCase()}</p>}
+          <p className="font-sans text-sm text-text-secondary">{status.text}</p>
+          {symbol && <p className="text-xs text-muted-foreground mt-1">{symbol.toUpperCase()}</p>}
         </div>
       </div>
     );
   }
   
   return (
-    <div className="flex flex-col h-full bg-black overflow-hidden">
+    <div className="flex flex-col h-full bg-surface-panel overflow-hidden">
       {symbol && (
-        <div className="flex items-center justify-between bg-black px-2 py-1 text-xs text-gray-600 border-b border-gray-800 font-mono">
+        <div className="flex items-center justify-between bg-surface-panel px-2 py-1 text-xs text-muted-foreground border-b border-line font-mono">
           <div className="flex items-center gap-3">
             <span>{maxLevels} levels</span>
             {/* Tick Size Selector */}
             <div className="flex items-center gap-1">
-              <span className="text-gray-600">Tick:</span>
+              <span className="text-muted-foreground">Tick:</span>
               <select
                 value={tickSize}
                 onChange={(e) => setTickSize(Number(e.target.value))}
-                className="bg-gray-900 border border-gray-700 text-[#00FF41] text-xs px-1 py-0.5 rounded cursor-pointer hover:border-[#00FF41] transition-colors"
+                className="bg-surface-inset border border-line text-buy text-xs px-1 py-0.5 rounded-sm cursor-pointer hover:border-buy transition-colors"
               >
                 <option value={0}>Auto</option>
                 {tickSizeOptions.map((size) => (
@@ -536,55 +536,55 @@ export function OrderBook({
               </select>
             </div>
           </div>
-          <span className="text-[#00FF41]">{stats.updatesPerSecond}/sec</span>
+          <span className="text-buy">{stats.updatesPerSecond}/sec</span>
         </div>
       )}
       
-      <div className="bg-black border-b border-gray-800 px-3 py-2">
+      <div className="bg-surface-panel border-b border-line px-3 py-2">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3 font-mono text-xs">
             <div>
-              <div className="text-gray-600 uppercase">SPREAD</div>
-              <div className="text-sm text-white tabular-nums">
+              <div className="font-sans text-[11px] text-muted-foreground">Spread</div>
+              <div className="text-sm text-foreground tabular-nums">
                 <span>{Number(spread).toFixed(2).replace(/[.,]00$/, "")}</span>
-                <span className="text-gray-600 ml-1">({spreadPercent.toFixed(2)}%)</span>
+                <span className="text-muted-foreground ml-1">({spreadPercent.toFixed(2)}%)</span>
               </div>
             </div>
-            <div className="h-6 w-px bg-gray-800" />
+            <div className="h-6 w-px bg-surface-raised" />
             <div>
-              <div className="text-gray-600 uppercase">MID</div>
-              <div className="text-sm text-white tabular-nums">{formatPrice(midPrice, assetType)}</div>
+              <div className="font-sans text-[11px] text-muted-foreground">Mid</div>
+              <div className="text-sm text-foreground tabular-nums">{formatPrice(midPrice, assetType)}</div>
             </div>
-            <div className="h-6 w-px bg-gray-800" />
+            <div className="h-6 w-px bg-surface-raised" />
             <div>
-              <div className="text-gray-600 uppercase">UPDATED</div>
-              <div className="text-sm text-[#00FF41] flex items-baseline tabular-nums">
+              <div className="font-sans text-[11px] text-muted-foreground">Updated</div>
+              <div className="text-sm text-buy flex items-baseline tabular-nums">
                 <span ref={timestampRef}>--:--:--.---</span>
-                <span ref={agoRef} className="text-[#00FF41] ml-1 text-xs">(0ms)</span>
+                <span ref={agoRef} className="text-buy ml-1 text-xs">(0ms)</span>
               </div>
             </div>
           </div>
           
-          <div className="ml-3 pl-3 border-l border-gray-800 font-mono" style={{ width: '90px', minWidth: '90px' }}>
-            <div className="text-xs text-gray-600 uppercase">IMB</div>
+          <div className="ml-3 pl-3 border-l border-line font-mono" style={{ width: '90px', minWidth: '90px' }}>
+            <div className="font-sans text-[11px] text-muted-foreground">Imbalance</div>
             <div className="flex items-center gap-1">
-              <div className="w-12 h-1.5 bg-gray-900 rounded-full overflow-hidden flex">
+              <div className="w-12 h-1.5 bg-surface-inset rounded-full overflow-hidden flex">
                 <div style={{ 
                   width: `${Math.min(Math.max(50 + imbalance / 2, 5), 95)}%`,
-                  backgroundColor: imbalance > 0 ? '#00FF41' : imbalance < 0 ? '#FF4545' : '#333'
+                  backgroundColor: imbalance > 0 ? 'var(--fr-color-market-buy)' : imbalance < 0 ? 'var(--fr-color-market-sell)' : 'var(--fr-color-border-default)'
                 }} />
               </div>
               <span className={cn("text-xs font-bold tabular-nums",
-                imbalance > 0 ? 'text-[#00FF41]' : imbalance < 0 ? 'text-[#FF4545]' : 'text-gray-600'
+                imbalance > 0 ? 'text-buy' : imbalance < 0 ? 'text-sell' : 'text-muted-foreground'
               )}>{imbalance >= 0 ? '+' : ''}{imbalance.toFixed(0)}%</span>
             </div>
           </div>
         </div>
       </div>
       
-      <div className="flex flex-1 overflow-hidden bg-black">
+      <div className="flex flex-1 overflow-hidden bg-surface-panel">
         <OrderBookSide levels={bidLevels} side="bid" maxSize={maxBidSize} assetType={assetType} showHeatmap={showHeatmap} />
-        <div className="w-px bg-gray-800" />
+        <div className="w-px bg-surface-raised" />
         <OrderBookSide levels={askLevels} side="ask" maxSize={maxAskSize} assetType={assetType} showHeatmap={showHeatmap} />
       </div>
     </div>

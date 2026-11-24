@@ -262,7 +262,7 @@ export const LiquidationHeatmap = memo(function LiquidationHeatmap({
 
   if (!currentPrice) {
     return (
-      <div className={cn("flex items-center justify-center p-4 text-gray-600 text-xs bg-black border border-gray-800 rounded", className)}>
+      <div className={cn("flex items-center justify-center p-4 text-gray-600 text-xs bg-black border border-gray-800 rounded-sm", className)}>
         <div className="text-center font-mono">
           <div className="text-lg mb-1 animate-pulse">◐</div>
           <span className="text-[#00FF41]">&gt; Loading price data...</span>
@@ -274,7 +274,7 @@ export const LiquidationHeatmap = memo(function LiquidationHeatmap({
   // Show loading state while fetching initial data
   if (hydrationState === 'loading' && levels.length === 0) {
     return (
-      <div className={cn("flex items-center justify-center p-4 text-gray-600 text-xs bg-black border border-gray-800 rounded", className)}>
+      <div className={cn("flex items-center justify-center p-4 text-gray-600 text-xs bg-black border border-gray-800 rounded-sm", className)}>
         <div className="text-center font-mono">
           <div className="text-lg mb-1 animate-spin">◐</div>
           <span className="text-purple-400">&gt; Fetching liquidation data...</span>
@@ -285,15 +285,15 @@ export const LiquidationHeatmap = memo(function LiquidationHeatmap({
   }
 
   return (
-    <div className={cn("bg-black border border-gray-800 rounded overflow-hidden flex flex-col", className)}>
+    <div className={cn("bg-black border border-gray-800 rounded-sm overflow-hidden flex flex-col", className)}>
       {/* Header */}
-      <div className="flex items-center justify-between px-2 py-1.5 border-b border-gray-800 bg-gray-900/30 flex-shrink-0">
+      <div className="flex items-center justify-between px-2 py-1.5 border-b border-gray-800 bg-gray-900/30 shrink-0">
         <div className="flex items-center gap-2">
           <span className="text-xs font-mono font-semibold text-purple-500 tracking-wider">
             LIQUIDATION ZONES
           </span>
           <span className={cn(
-            "text-[8px] px-1 rounded font-mono",
+            "text-[8px] px-1 rounded-sm font-mono",
             hydrationState === 'polling' ? "bg-purple-500/20 text-purple-400" : "bg-gray-800 text-gray-500"
           )}>
             {hydrationState === 'polling' ? 'LIVE' : 'EST'}
@@ -365,7 +365,7 @@ export const LiquidationHeatmap = memo(function LiquidationHeatmap({
       </div>
 
       {/* Footer */}
-      <div className="px-2 py-1 border-t border-gray-800 bg-gray-900/20 text-[9px] text-gray-600 font-mono flex-shrink-0">
+      <div className="px-2 py-1 border-t border-gray-800 bg-gray-900/20 text-[9px] text-gray-600 font-mono shrink-0">
         Estimated based on common leverage levels • Not financial advice
       </div>
     </div>

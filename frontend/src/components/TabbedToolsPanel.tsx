@@ -41,18 +41,18 @@ export const TabbedToolsPanel = memo(function TabbedToolsPanel({
 
   return (
     <div className={cn(
-      "flex flex-col h-full bg-black border border-gray-800 rounded overflow-hidden",
+      "flex flex-col h-full bg-black border border-gray-800 rounded-sm overflow-hidden",
       className
     )}>
       {/* Tab Bar */}
-      <div className="flex items-center border-b border-gray-800 bg-gray-900/30 flex-shrink-0">
+      <div className="flex items-center border-b border-gray-800 bg-gray-900/30 shrink-0">
         {TABS.map((tab) => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
             className={cn(
               "flex-1 px-3 py-2 text-xs font-mono font-semibold tracking-wider transition-all",
-              "border-b-2 -mb-[1px]",
+              "border-b-2 -mb-px",
               activeTab === tab.id
                 ? cn(tab.color, "border-current bg-black/50")
                 : "text-gray-600 border-transparent hover:text-gray-400 hover:bg-gray-900/50"
@@ -91,7 +91,7 @@ export const TabbedToolsPanel = memo(function TabbedToolsPanel({
       </div>
 
       {/* Status Bar */}
-      <div className="flex items-center justify-between px-3 py-1 border-t border-gray-800 bg-gray-900/20 text-[10px] text-gray-600 font-mono flex-shrink-0">
+      <div className="flex items-center justify-between px-3 py-1 border-t border-gray-800 bg-gray-900/20 text-[10px] text-gray-600 font-mono shrink-0">
         <span className={activeTabConfig.color}>● {activeTabConfig.label}</span>
         <span>{new Date().toLocaleTimeString('en-US', { hour12: false })}</span>
       </div>

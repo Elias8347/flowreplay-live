@@ -325,9 +325,9 @@ export function ChartPanel({ trades: externalTrades, symbol, width = 600, classN
   return (
     <div className={`flex flex-col h-full w-full min-h-0 ${className}`}>
       {(visualization.showPriceChart || visualization.showVolumeChart) && (
-        <div className="flex-1 flex flex-col bg-black rounded overflow-hidden min-h-0">
+        <div className="flex-1 flex flex-col bg-black rounded-sm overflow-hidden min-h-0">
           {/* Chart Header with Controls */}
-          <div className="flex items-center justify-between px-2 py-1 border-b border-gray-800 flex-shrink-0 gap-2">
+          <div className="flex items-center justify-between px-2 py-1 border-b border-gray-800 shrink-0 gap-2">
             {/* Left: Chart View Toggle */}
             <div className="flex items-center gap-1">
               {(['candlestick', 'heikin-ashi', 'line'] as const).map((view) => (
@@ -335,7 +335,7 @@ export function ChartPanel({ trades: externalTrades, symbol, width = 600, classN
                   key={view}
                   onClick={() => setChartView(view)}
                   className={cn(
-                    "px-1.5 py-0.5 text-[10px] font-mono uppercase rounded transition-colors",
+                    "px-1.5 py-0.5 text-[10px] font-mono uppercase rounded-sm transition-colors",
                     chartView === view
                       ? "bg-[#00FF41]/20 text-[#00FF41] border border-[#00FF41]/50"
                       : "text-gray-500 hover:text-gray-400 border border-transparent"
@@ -347,13 +347,13 @@ export function ChartPanel({ trades: externalTrades, symbol, width = 600, classN
             </div>
             
             {/* Center: Time Interval Selector */}
-            <div className="flex items-center gap-0.5 bg-gray-900/50 rounded px-1 py-0.5">
+            <div className="flex items-center gap-0.5 bg-gray-900/50 rounded-sm px-1 py-0.5">
               {TIME_INTERVALS.map((interval) => (
                 <button
                   key={interval.label}
                   onClick={() => setSelectedInterval(interval)}
                   className={cn(
-                    "px-2 py-0.5 text-[10px] font-mono rounded transition-colors",
+                    "px-2 py-0.5 text-[10px] font-mono rounded-sm transition-colors",
                     selectedInterval.value === interval.value
                       ? "bg-[#00FF41] text-black font-bold"
                       : "text-gray-500 hover:text-[#00FF41] hover:bg-gray-800"
@@ -369,7 +369,7 @@ export function ChartPanel({ trades: externalTrades, symbol, width = 600, classN
               <Tooltip content="Zoom In" position="left">
                 <button
                   onClick={handleZoomIn}
-                  className="p-1 text-gray-500 hover:text-[#00FF41] transition-colors rounded hover:bg-gray-800"
+                  className="p-1 text-gray-500 hover:text-[#00FF41] transition-colors rounded-sm hover:bg-gray-800"
                 >
                   <ZoomInIcon />
                 </button>
@@ -377,7 +377,7 @@ export function ChartPanel({ trades: externalTrades, symbol, width = 600, classN
               <Tooltip content="Zoom Out" position="left">
                 <button
                   onClick={handleZoomOut}
-                  className="p-1 text-gray-500 hover:text-[#00FF41] transition-colors rounded hover:bg-gray-800"
+                  className="p-1 text-gray-500 hover:text-[#00FF41] transition-colors rounded-sm hover:bg-gray-800"
                 >
                   <ZoomOutIcon />
                 </button>
@@ -385,7 +385,7 @@ export function ChartPanel({ trades: externalTrades, symbol, width = 600, classN
               <Tooltip content="Auto-scale: Fit chart to visible data" position="left">
                 <button
                   onClick={handleAutoScale}
-                  className="p-1 text-gray-500 hover:text-[#00FF41] transition-colors rounded hover:bg-gray-800"
+                  className="p-1 text-gray-500 hover:text-[#00FF41] transition-colors rounded-sm hover:bg-gray-800"
                 >
                   <AutoScaleIcon />
                 </button>

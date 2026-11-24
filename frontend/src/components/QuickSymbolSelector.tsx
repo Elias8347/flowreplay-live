@@ -156,11 +156,11 @@ export function QuickSymbolSelector({ className }: QuickSymbolSelectorProps) {
         onClick={() => setIsOpen(!isOpen)}
         onKeyDown={handleKeyDown}
         className={cn(
-          "flex items-center gap-1.5 px-2 py-1 rounded border text-xs font-mono",
+          "flex items-center gap-1.5 px-2 py-1 rounded-sm border text-xs font-mono",
           "transition-all duration-150",
           isOpen
-            ? "border-[var(--tf-accent-primary)] bg-[var(--tf-bg-tertiary)]"
-            : "border-[var(--tf-border-primary)] hover:border-[var(--tf-border-secondary)] bg-[var(--tf-bg-secondary)]"
+            ? "border-(--tf-accent-primary) bg-(--tf-bg-tertiary)"
+            : "border-(--tf-border-primary) hover:border-(--tf-border-secondary) bg-(--tf-bg-secondary)"
         )}
         style={{ 
           color: selectedSymbol ? accentColor : 'var(--tf-text-secondary)',
@@ -193,9 +193,9 @@ export function QuickSymbolSelector({ className }: QuickSymbolSelectorProps) {
                 onKeyDown={handleKeyDown}
                 placeholder="Search symbol..."
                 className={cn(
-                  "w-full pl-7 pr-3 py-1.5 rounded text-xs font-mono",
-                  "outline-none transition-colors",
-                  "placeholder:text-[var(--tf-text-muted)]"
+                  "w-full pl-7 pr-3 py-1.5 rounded-sm text-xs font-mono",
+                  "outline-hidden transition-colors",
+                  "placeholder:text-(--tf-text-muted)"
                 )}
                 style={{
                   backgroundColor: 'var(--tf-bg-tertiary)',
@@ -203,7 +203,7 @@ export function QuickSymbolSelector({ className }: QuickSymbolSelectorProps) {
                   border: '1px solid var(--tf-border-secondary)',
                 }}
               />
-              <div className="absolute left-2 top-1/2 -translate-y-1/2 text-[var(--tf-text-muted)]">
+              <div className="absolute left-2 top-1/2 -translate-y-1/2 text-(--tf-text-muted)">
                 <SearchIcon />
               </div>
             </div>
@@ -244,7 +244,7 @@ export function QuickSymbolSelector({ className }: QuickSymbolSelectorProps) {
                       {symbol}
                       {isActive && !isSelected && (
                         <span 
-                          className="px-1 py-0.5 rounded text-[9px]"
+                          className="px-1 py-0.5 rounded-sm text-[9px]"
                           style={{ 
                             backgroundColor: 'var(--tf-bg-tertiary)',
                             color: 'var(--tf-text-muted)',
@@ -270,7 +270,7 @@ export function QuickSymbolSelector({ className }: QuickSymbolSelectorProps) {
                 {searchQuery && (
                   <button
                     onClick={() => handleSelectSymbol(searchQuery)}
-                    className="mt-2 px-3 py-1.5 rounded text-xs font-mono border"
+                    className="mt-2 px-3 py-1.5 rounded-sm text-xs font-mono border"
                     style={{
                       borderColor: accentColor,
                       color: accentColor,

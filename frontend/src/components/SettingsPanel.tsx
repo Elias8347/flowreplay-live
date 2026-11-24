@@ -37,13 +37,13 @@ function ColorPicker({ label, value, onChange }: ColorPickerProps) {
           type="color"
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          className="w-8 h-8 rounded border border-gray-700 cursor-pointer bg-transparent"
+          className="w-8 h-8 rounded-sm border border-gray-700 cursor-pointer bg-transparent"
         />
         <input
           type="text"
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          className="w-20 px-2 py-1 bg-gray-800 border border-gray-700 rounded text-xs font-mono text-gray-300"
+          className="w-20 px-2 py-1 bg-gray-800 border border-gray-700 rounded-sm text-xs font-mono text-gray-300"
         />
       </div>
     </div>
@@ -85,7 +85,7 @@ function HotkeyRow({ keys, description }: { keys: string[]; description: string 
       <span className="text-sm text-gray-400">{description}</span>
       <div className="flex gap-1">
         {keys.map((key, i) => (
-          <kbd key={i} className="px-2 py-0.5 bg-gray-800 border border-gray-700 rounded text-xs font-mono text-gray-300">
+          <kbd key={i} className="px-2 py-0.5 bg-gray-800 border border-gray-700 rounded-sm text-xs font-mono text-gray-300">
             {key}
           </kbd>
         ))}
@@ -143,7 +143,7 @@ export function SettingsPanel({ onClose }: SettingsPanelProps) {
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
               className={cn(
-                "px-3 py-1.5 rounded text-xs font-mono transition-colors",
+                "px-3 py-1.5 rounded-sm text-xs font-mono transition-colors",
                 activeTab === tab.id
                   ? "bg-[#00FF41] text-black"
                   : "bg-gray-800 text-gray-400 hover:text-white"
@@ -195,7 +195,7 @@ export function SettingsPanel({ onClose }: SettingsPanelProps) {
                   type="number"
                   value={colors.whaleThreshold}
                   onChange={(e) => updateColors({ whaleThreshold: parseInt(e.target.value) || 50000 })}
-                  className="w-24 px-2 py-1 bg-gray-800 border border-gray-700 rounded text-sm text-gray-300"
+                  className="w-24 px-2 py-1 bg-gray-800 border border-gray-700 rounded-sm text-sm text-gray-300"
                 />
               </div>
             </div>
@@ -231,7 +231,7 @@ export function SettingsPanel({ onClose }: SettingsPanelProps) {
 
             <button
               onClick={resetColors}
-              className="w-full py-2 bg-gray-800 hover:bg-gray-700 rounded text-sm text-gray-400 transition-colors"
+              className="w-full py-2 bg-gray-800 hover:bg-gray-700 rounded-sm text-sm text-gray-400 transition-colors"
             >
               Reset to Defaults
             </button>
@@ -280,7 +280,7 @@ export function SettingsPanel({ onClose }: SettingsPanelProps) {
                 onChange={(e) => updateVisualization({ chartHeight: parseInt(e.target.value) || 200 })}
                 min={100}
                 max={400}
-                className="w-20 px-2 py-1 bg-gray-800 border border-gray-700 rounded text-sm text-gray-300"
+                className="w-20 px-2 py-1 bg-gray-800 border border-gray-700 rounded-sm text-sm text-gray-300"
               />
             </div>
           </div>
@@ -298,7 +298,7 @@ export function SettingsPanel({ onClose }: SettingsPanelProps) {
                 onChange={(e) => updatePaperSettings?.({ slippageBps: parseInt(e.target.value) || 5 })}
                 min={0}
                 max={100}
-                className="w-20 px-2 py-1 bg-gray-800 border border-gray-700 rounded text-sm text-gray-300"
+                className="w-20 px-2 py-1 bg-gray-800 border border-gray-700 rounded-sm text-sm text-gray-300"
               />
             </div>
             
@@ -310,7 +310,7 @@ export function SettingsPanel({ onClose }: SettingsPanelProps) {
                 onChange={(e) => updatePaperSettings?.({ feeBps: parseInt(e.target.value) || 4 })}
                 min={0}
                 max={50}
-                className="w-20 px-2 py-1 bg-gray-800 border border-gray-700 rounded text-sm text-gray-300"
+                className="w-20 px-2 py-1 bg-gray-800 border border-gray-700 rounded-sm text-sm text-gray-300"
               />
             </div>
 
@@ -324,7 +324,7 @@ export function SettingsPanel({ onClose }: SettingsPanelProps) {
                     type="number"
                     defaultValue={100000}
                     min={1000}
-                    className="w-24 px-2 py-1 bg-gray-800 border border-gray-700 rounded text-sm text-gray-300"
+                    className="w-24 px-2 py-1 bg-gray-800 border border-gray-700 rounded-sm text-sm text-gray-300"
                   />
                 </div>
                 
@@ -334,7 +334,7 @@ export function SettingsPanel({ onClose }: SettingsPanelProps) {
                     type="number"
                     defaultValue={5000}
                     min={100}
-                    className="w-24 px-2 py-1 bg-gray-800 border border-gray-700 rounded text-sm text-gray-300"
+                    className="w-24 px-2 py-1 bg-gray-800 border border-gray-700 rounded-sm text-sm text-gray-300"
                   />
                 </div>
                 
@@ -345,7 +345,7 @@ export function SettingsPanel({ onClose }: SettingsPanelProps) {
                     defaultValue={5}
                     min={1}
                     max={20}
-                    className="w-20 px-2 py-1 bg-gray-800 border border-gray-700 rounded text-sm text-gray-300"
+                    className="w-20 px-2 py-1 bg-gray-800 border border-gray-700 rounded-sm text-sm text-gray-300"
                   />
                 </div>
               </div>
@@ -353,7 +353,7 @@ export function SettingsPanel({ onClose }: SettingsPanelProps) {
 
             <button
               onClick={() => resetPaperTrading?.()}
-              className="w-full py-2 bg-red-900/50 hover:bg-red-900 rounded text-sm text-red-400 transition-colors"
+              className="w-full py-2 bg-red-900/50 hover:bg-red-900 rounded-sm text-sm text-red-400 transition-colors"
             >
               Reset Paper Trading Account
             </button>
@@ -393,7 +393,7 @@ export function SettingsPanel({ onClose }: SettingsPanelProps) {
                   onChange={(e) => updateVisualization({ alertCooldownSeconds: Math.max(1, Math.min(300, parseInt(e.target.value) || 5)) })}
                   min={1}
                   max={300}
-                  className="w-20 px-2 py-1 bg-gray-800 border border-gray-700 rounded text-sm text-gray-300"
+                  className="w-20 px-2 py-1 bg-gray-800 border border-gray-700 rounded-sm text-sm text-gray-300"
                 />
               </div>
             </div>
@@ -401,15 +401,15 @@ export function SettingsPanel({ onClose }: SettingsPanelProps) {
             <div className="pt-4 border-t border-gray-800">
               <h4 className="text-sm font-mono text-gray-500 uppercase mb-3">Quick Alert Presets</h4>
               <div className="space-y-2 text-sm text-gray-400">
-                <div className="flex items-center justify-between p-2 bg-gray-900 rounded">
+                <div className="flex items-center justify-between p-2 bg-gray-900 rounded-sm">
                   <span>Whale Trade (&gt;$50K)</span>
                   <span className="text-[#00FF41]">Active</span>
                 </div>
-                <div className="flex items-center justify-between p-2 bg-gray-900 rounded">
+                <div className="flex items-center justify-between p-2 bg-gray-900 rounded-sm">
                   <span>Price Break (1% move)</span>
                   <span className="text-[#00FF41]">Active</span>
                 </div>
-                <div className="flex items-center justify-between p-2 bg-gray-900 rounded">
+                <div className="flex items-center justify-between p-2 bg-gray-900 rounded-sm">
                   <span>High OPS (&gt;100/s)</span>
                   <span className="text-gray-600">Inactive</span>
                 </div>
@@ -450,7 +450,7 @@ export function SettingsPanel({ onClose }: SettingsPanelProps) {
             </div>
             
             <p className="text-xs text-gray-600 mt-4">
-              Press <kbd className="px-1 bg-gray-800 rounded">?</kbd> anywhere to see the full shortcuts panel
+              Press <kbd className="px-1 bg-gray-800 rounded-sm">?</kbd> anywhere to see the full shortcuts panel
             </p>
           </div>
         )}
@@ -464,7 +464,7 @@ export function SettingsPanel({ onClose }: SettingsPanelProps) {
                 <div
                   key={profile.name}
                   className={cn(
-                    "flex items-center justify-between p-3 rounded border transition-colors",
+                    "flex items-center justify-between p-3 rounded-sm border transition-colors",
                     activeProfile === profile.name
                       ? "border-[#00FF41] bg-[#001100]"
                       : "border-gray-800 hover:border-gray-700"
@@ -473,11 +473,11 @@ export function SettingsPanel({ onClose }: SettingsPanelProps) {
                   <div className="flex items-center gap-3">
                     <div className="flex gap-1">
                       <div
-                        className="w-4 h-4 rounded"
+                        className="w-4 h-4 rounded-sm"
                         style={{ backgroundColor: profile.colors.buyColor }}
                       />
                       <div
-                        className="w-4 h-4 rounded"
+                        className="w-4 h-4 rounded-sm"
                         style={{ backgroundColor: profile.colors.sellColor }}
                       />
                     </div>
@@ -487,7 +487,7 @@ export function SettingsPanel({ onClose }: SettingsPanelProps) {
                     <button
                       onClick={() => loadProfile(profile.name)}
                       className={cn(
-                        "px-2 py-1 text-xs rounded transition-colors",
+                        "px-2 py-1 text-xs rounded-sm transition-colors",
                         activeProfile === profile.name
                           ? "bg-[#00FF41] text-black"
                           : "bg-gray-800 text-gray-400 hover:text-white"
@@ -498,7 +498,7 @@ export function SettingsPanel({ onClose }: SettingsPanelProps) {
                     {!['Terminal', 'Classic', 'Ocean', 'High Contrast'].includes(profile.name) && (
                       <button
                         onClick={() => deleteProfile(profile.name)}
-                        className="px-2 py-1 text-xs bg-red-900/50 text-red-400 rounded hover:bg-red-900 transition-colors"
+                        className="px-2 py-1 text-xs bg-red-900/50 text-red-400 rounded-sm hover:bg-red-900 transition-colors"
                       >
                         Delete
                       </button>
@@ -516,7 +516,7 @@ export function SettingsPanel({ onClose }: SettingsPanelProps) {
                   value={newProfileName}
                   onChange={(e) => setNewProfileName(e.target.value)}
                   placeholder="Profile name..."
-                  className="flex-1 px-3 py-2 bg-gray-800 border border-gray-700 rounded text-sm text-gray-300"
+                  className="flex-1 px-3 py-2 bg-gray-800 border border-gray-700 rounded-sm text-sm text-gray-300"
                 />
                 <button
                   onClick={() => {
@@ -525,7 +525,7 @@ export function SettingsPanel({ onClose }: SettingsPanelProps) {
                       setNewProfileName('');
                     }
                   }}
-                  className="px-4 py-2 bg-[#00FF41] text-black rounded text-sm font-medium hover:bg-[#00DD35] transition-colors"
+                  className="px-4 py-2 bg-[#00FF41] text-black rounded-sm text-sm font-medium hover:bg-[#00DD35] transition-colors"
                 >
                   Save
                 </button>

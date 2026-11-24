@@ -352,7 +352,7 @@ export const OIMonitor = memo(function OIMonitor({
     if (isLoading) {
       return (
         <div className={cn(
-          "flex items-center justify-center px-3 py-2 bg-black border border-gray-800 rounded",
+          "flex items-center justify-center px-3 py-2 bg-black border border-gray-800 rounded-sm",
           className
         )}>
           <span className="text-xs text-gray-500 font-mono animate-pulse">Loading OI...</span>
@@ -363,7 +363,7 @@ export const OIMonitor = memo(function OIMonitor({
     if (error || currentOI === null) {
       return (
         <div className={cn(
-          "flex items-center justify-between px-3 py-2 bg-black border border-gray-800 rounded",
+          "flex items-center justify-between px-3 py-2 bg-black border border-gray-800 rounded-sm",
           className
         )}>
           <span className="text-xs text-yellow-500 font-mono font-semibold">OI</span>
@@ -374,23 +374,23 @@ export const OIMonitor = memo(function OIMonitor({
 
     return (
       <div className={cn(
-        "flex items-center justify-between px-3 py-2 bg-black border border-gray-800 rounded gap-2",
+        "flex items-center justify-between px-3 py-2 bg-black border border-gray-800 rounded-sm gap-2",
         className
       )}>
         {/* Label */}
-        <span className="text-xs text-yellow-500 font-mono font-semibold tracking-wider flex-shrink-0">
+        <span className="text-xs text-yellow-500 font-mono font-semibold tracking-wider shrink-0">
           OI
         </span>
         
         {/* Sparkline */}
         {sparklineData.length > 1 && (
-          <div className="flex-shrink-0">
+          <div className="shrink-0">
             <Sparkline data={sparklineData} width={60} height={18} color={trendColor} />
           </div>
         )}
 
         {/* Value + Change */}
-        <div className="flex items-center gap-2 flex-shrink-0">
+        <div className="flex items-center gap-2 shrink-0">
           <span className="text-sm font-mono font-bold text-white tabular-nums">
             ${formatOI(currentOI)}
           </span>
@@ -434,9 +434,9 @@ export const OIMonitor = memo(function OIMonitor({
   }
 
   return (
-    <div className={cn("bg-black border border-gray-800 rounded overflow-hidden flex flex-col", className)}>
+    <div className={cn("bg-black border border-gray-800 rounded-sm overflow-hidden flex flex-col", className)}>
       {/* Header */}
-      <div className="flex items-center justify-between px-2 py-1.5 border-b border-gray-800 bg-gray-900/30 flex-shrink-0">
+      <div className="flex items-center justify-between px-2 py-1.5 border-b border-gray-800 bg-gray-900/30 shrink-0">
         <span className="text-xs font-mono font-semibold text-yellow-500 tracking-wider">
           <LabelWithTooltip label="OPEN INTEREST" term="Open Interest" />
         </span>
@@ -469,7 +469,7 @@ export const OIMonitor = memo(function OIMonitor({
         {/* Delta Stats */}
         <div className="grid grid-cols-2 gap-2 text-xs font-mono">
           {/* 5 Minute Delta */}
-          <div className="bg-gray-900/50 rounded p-2">
+          <div className="bg-gray-900/50 rounded-sm p-2">
             <div className="text-[10px] text-gray-500 uppercase mb-1">5M DELTA</div>
             <div className={cn(
               "font-semibold tabular-nums",
@@ -486,7 +486,7 @@ export const OIMonitor = memo(function OIMonitor({
           </div>
           
           {/* 1 Hour Delta */}
-          <div className="bg-gray-900/50 rounded p-2">
+          <div className="bg-gray-900/50 rounded-sm p-2">
             <div className="text-[10px] text-gray-500 uppercase mb-1">1H DELTA</div>
             <div className={cn(
               "font-semibold tabular-nums",
@@ -505,7 +505,7 @@ export const OIMonitor = memo(function OIMonitor({
         
         {/* Sentiment Indicator */}
         <div className={cn(
-          "text-center text-[10px] font-mono py-1 rounded",
+          "text-center text-[10px] font-mono py-1 rounded-sm",
           delta5m > 0 && deltaHour > 0 ? "bg-[#00FF41]/10 text-[#00FF41]" :
           delta5m < 0 && deltaHour < 0 ? "bg-[#FF4545]/10 text-[#FF4545]" :
           "bg-gray-800/50 text-gray-500"

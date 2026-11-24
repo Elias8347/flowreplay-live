@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Footprint Spike</title>
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@500;700&display=swap" rel="stylesheet" />
+    <style>
+      html, body { margin: 0; height: 100%; background: #0c0e11; color: #fafafa; font-family: Geist, system-ui, sans-serif; }
+      #wrap { position: absolute; inset: 0; display: flex; flex-direction: column; }
+      #legend, #stats { padding: 6px 12px; font: 500 12px "Geist Mono", ui-monospace, monospace; background: #15181d; border-bottom: 1px solid #2b2e32; white-space: nowrap; overflow: hidden; }
+      #stats { color: #949ca6; border-top: 1px solid #2b2e32; border-bottom: 0; }
+      #chart { flex: 1; min-height: 0; }
+    </style>
+  </head>
+  <body>
+    <div id="wrap">
+      <div id="legend">Loading...</div>
+      <div id="chart"></div>
+      <div id="stats">Measuring...</div>
+    </div>
+    <script type="module" src="/src/spike/main.ts"></script>
+  </body>
+</html>

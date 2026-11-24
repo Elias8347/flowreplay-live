@@ -66,8 +66,9 @@ function clearDeduplicationCache(symbol: string): void {
 }
 
 // Liquidation colors
-const LIQUIDATION_LONG_COLOR = '#A855F7';   // Purple for long liquidations (rekt longs)
-const LIQUIDATION_SHORT_COLOR = '#F97316';  // Orange for short liquidations (rekt shorts)
+// Long liquidations are forced sells, short liquidations are forced buys
+const LIQUIDATION_LONG_COLOR = 'var(--fr-color-market-sell)';
+const LIQUIDATION_SHORT_COLOR = 'var(--fr-color-market-buy)';
 
 // Skull icon component for liquidations
 function SkullIcon({ className }: { className?: string }) {
@@ -155,7 +156,7 @@ function getLiquidationStyles(trade: TradeWithAnalytics) {
   const color = isLongLiq ? LIQUIDATION_LONG_COLOR : LIQUIDATION_SHORT_COLOR;
   
   return {
-    backgroundColor: isLongLiq ? 'rgba(168, 85, 247, 0.15)' : 'rgba(249, 115, 22, 0.15)',
+    backgroundColor: isLongLiq ? 'rgba(250, 111, 95, 0.14)' : 'rgba(54, 207, 143, 0.14)',
     borderLeftColor: color,
     boxShadow: `0 0 12px ${color}40, inset 0 0 20px ${color}10`,
     color,
@@ -177,13 +178,13 @@ const TradeRow = memo(function TradeRow({ trade, assetType, onClick, showAnalyti
     <div
       onClick={onClick}
       className={cn(
-        "flex border-b border-gray-900/50 text-sm transition-all",
+        "flex border-b border-line/50 text-xs transition-all",
         !isLiquidation && getSideBackground(trade.side),
         isWhale && !isLiquidation && (trade.side === 'buy' 
-          ? "!bg-[#001100] !border-l-[#00FF41] shadow-[0_0_8px_rgba(0,255,65,0.3)]" 
-          : "!bg-[#110000] !border-l-[#FF4545] shadow-[0_0_8px_rgba(255,69,69,0.3)]"),
+          ? "bg-buy/10! border-l-buy!" 
+          : "bg-sell/10! border-l-sell!"),
         isLiquidation && "border-l-4 animate-pulse",
-        onClick && "cursor-pointer hover:bg-gray-900/50"
+        onClick && "cursor-pointer hover:bg-surface-hover"
       )}
       style={liquidationStyles ? {
         backgroundColor: liquidationStyles.backgroundColor,
@@ -191,80 +192,80 @@ const TradeRow = memo(function TradeRow({ trade, assetType, onClick, showAnalyti
         boxShadow: liquidationStyles.boxShadow,
       } : undefined}
     >
-      <div className="w-24 px-3 py-1.5 text-left flex items-center gap-1">
+      <div className="min-w-0 overflow-hidden flex-[1.15] px-1.5 py-1.5 text-left flex items-center gap-1">
         {isLiquidation && (
           <SkullIcon 
             className={cn(
-              "flex-shrink-0",
-              trade.liquidationSide === 'long' ? 'text-purple-400' : 'text-orange-400'
+              "shrink-0",
+              trade.liquidationSide === 'long' ? 'text-sell' : 'text-buy'
             )} 
           />
         )}
         <span className={cn(
           "font-mono text-xs",
-          isLiquidation ? (trade.liquidationSide === 'long' ? 'text-purple-300' : 'text-orange-300') :
-          isWhale ? "text-white font-bold" : "text-gray-300"
+          isLiquidation ? (trade.liquidationSide === 'long' ? 'text-sell' : 'text-buy') :
+          isWhale ? "text-foreground font-bold" : "text-text-secondary"
         )}>
           {formatTime(trade.timestamp)}
         </span>
       </div>
       
-      <div className="w-24 px-3 py-1.5 text-right">
+      <div className="min-w-0 overflow-hidden flex-1 px-1.5 py-1.5 text-right">
         <span className={cn(
           "font-mono",
           isLiquidation ? "font-bold" : "",
-          isWhale && !isLiquidation ? "font-bold text-base" : "font-semibold"
+          isWhale && !isLiquidation ? "font-bold text-sm" : "font-semibold"
         )} style={isLiquidation ? { color: liquidationColor } : undefined}>
           {isLiquidation ? '' : ''}{formatPrice(trade.price, assetType)}
         </span>
       </div>
       
-      <div className="w-24 px-3 py-1.5 text-right flex items-center justify-end gap-1">
+      <div className="min-w-0 overflow-hidden flex-1 px-1.5 py-1.5 text-right flex items-center justify-end gap-1">
         {isLiquidation && (
           <DropletIcon 
             className={cn(
-              "flex-shrink-0",
-              trade.liquidationSide === 'long' ? 'text-purple-400' : 'text-orange-400'
+              "shrink-0",
+              trade.liquidationSide === 'long' ? 'text-sell' : 'text-buy'
             )} 
           />
         )}
         <span className={cn(
           "font-mono font-semibold",
-          isLiquidation ? (trade.liquidationSide === 'long' ? 'text-purple-200 font-bold' : 'text-orange-200 font-bold') :
-          isWhale ? "text-white text-base font-bold" : "text-gray-100"
+          isLiquidation ? (trade.liquidationSide === 'long' ? 'text-sell font-bold' : 'text-buy font-bold') :
+          isWhale ? "text-foreground text-sm font-bold" : "text-foreground"
         )}>
           {formatVolume(trade.volume)}
         </span>
       </div>
       
-      <div className="w-24 px-3 py-1.5 text-right">
+      <div className="hidden min-w-0 overflow-hidden flex-1 px-1.5 py-1.5 text-right @[22rem]:block">
         <span className={cn(
           "font-mono font-semibold",
-          isLiquidation ? (trade.liquidationSide === 'long' ? 'text-purple-100 font-bold' : 'text-orange-100 font-bold') :
-          isWhale ? "text-white text-sm font-bold" : "text-gray-200 text-xs"
+          isLiquidation ? (trade.liquidationSide === 'long' ? 'text-sell font-bold' : 'text-buy font-bold') :
+          isWhale ? "text-foreground text-sm font-bold" : "text-foreground text-xs"
         )}>
           {formatAmount(amount)}
         </span>
       </div>
       
-      <div className="w-16 px-3 py-1.5 text-center">
+      <div className="w-[58px] shrink-0 px-1 py-1.5 text-center">
         {isLiquidation ? (
           <span className={cn(
-            "px-2 py-0.5 rounded text-xs font-black uppercase tracking-wider",
+            "px-1.5 py-0.5 rounded-sm text-[10.5px] font-semibold",
             trade.liquidationSide === 'long' 
-              ? 'bg-purple-900/50 text-purple-300 ring-1 ring-purple-500/50' 
-              : 'bg-orange-900/50 text-orange-300 ring-1 ring-orange-500/50'
+              ? 'bg-warning/15 text-warning ring-1 ring-warning/40' 
+              : 'bg-warning/15 text-warning ring-1 ring-warning/40'
           )}>
             LIQ
           </span>
         ) : (
           <span className={cn(
-            "px-2 py-0.5 rounded text-xs font-black uppercase tracking-wider",
-            trade.side === 'buy' ? 'bg-[#001100] text-[#00FF41] ring-1 ring-[#00FF41]/50' 
-              : trade.side === 'sell' ? 'bg-[#110000] text-[#FF4545] ring-1 ring-[#FF4545]/50' 
-              : 'bg-gray-900 text-gray-400'
+            "px-1.5 py-0.5 rounded-sm text-[10.5px] font-semibold",
+            trade.side === 'buy' ? 'bg-buy/12 text-buy' 
+              : trade.side === 'sell' ? 'bg-sell/12 text-sell' 
+              : 'bg-surface-inset text-text-secondary'
           )}>
-            {trade.side === 'buy' ? 'BUY' : trade.side === 'sell' ? 'SELL' : '?'}
+            {trade.side === 'buy' ? '▲ Buy' : trade.side === 'sell' ? '▼ Sell' : '?'}
           </span>
         )}
       </div>
@@ -272,7 +273,7 @@ const TradeRow = memo(function TradeRow({ trade, assetType, onClick, showAnalyti
       {showAnalytics && (
         <>
           <div className="w-24 px-3 py-1.5 text-right">
-            <span className="text-gray-200 font-mono font-semibold text-sm">
+            <span className="text-foreground font-mono font-semibold text-sm">
               {formatPrice(trade.vwap, assetType)}
             </span>
           </div>
@@ -280,7 +281,7 @@ const TradeRow = memo(function TradeRow({ trade, assetType, onClick, showAnalyti
           <div className="w-24 px-3 py-1.5 text-right">
             <span className={cn(
               "font-mono font-semibold",
-              trade.delta > 0 ? 'text-[#00FF41]' : trade.delta < 0 ? 'text-[#FF4545]' : 'text-gray-500'
+              trade.delta > 0 ? 'text-buy' : trade.delta < 0 ? 'text-sell' : 'text-muted-foreground'
             )}>
               {formatCVD(trade.delta * trade.price)}
             </span>
@@ -431,53 +432,53 @@ export function TapeTable({
   
   if (tradesToDisplay.length === 0) {
     return (
-      <div className="flex items-center justify-center h-64 text-gray-500">
+      <div className="flex items-center justify-center h-64 text-muted-foreground">
         <div className="text-center">
-          <div className="text-4xl mb-2 text-gray-600">...</div>
+          <div className="text-4xl mb-2 text-muted-foreground">...</div>
           <p>Waiting for trades...</p>
-          {symbol && <p className="text-xs mt-2 text-gray-600">Listening for {symbol}</p>}
+          {symbol && <p className="text-xs mt-2 text-muted-foreground">Listening for {symbol}</p>}
         </div>
       </div>
     );
   }
   
   return (
-    <div className="flex flex-col h-full">
+    <div className="@container flex h-full flex-col">
       {symbol && (
-        <div className="flex items-center justify-between bg-gray-800/30 px-3 py-1.5 text-xs text-gray-400 border-b border-gray-800 flex-shrink-0">
+        <div className="flex items-center justify-between bg-surface-panel px-3 py-1.5 text-xs text-text-secondary border-b border-line shrink-0">
           <div className="flex items-center gap-3">
             <span className="tabular-nums">{tradesToDisplay.length} trades</span>
             <div className="flex items-center gap-1">
-              <label className="text-gray-500 text-[10px]">Min $</label>
+              <label className="text-muted-foreground text-[10px]">Min $</label>
               <input
                 type="number"
                 value={minTradeSize}
                 onChange={(e) => setMinTradeSize(Math.max(0, Number(e.target.value)))}
-                className="w-14 px-1 py-0.5 bg-gray-700 border border-gray-600 rounded text-gray-200 text-[10px] font-mono focus:outline-none focus:border-blue-500"
+                className="w-14 px-1 py-0.5 bg-surface-inset border border-line rounded-sm text-foreground text-[10px] font-mono focus:outline-hidden focus:border-ring"
                 min="0"
                 step="100"
               />
             </div>
             {stats.duplicatesFiltered > 0 && (
-              <span className="text-gray-600 text-[10px]">-{stats.duplicatesFiltered} dups</span>
+              <span className="text-muted-foreground text-[10px]">-{stats.duplicatesFiltered} dups</span>
             )}
           </div>
-          <span className="text-[#00FF41] tabular-nums">
+          <span className="text-buy tabular-nums">
             {stats.tradesPerSecond}/s
             {stats.avgTradesPerSecond > 0 && (
-              <span className="text-gray-500 ml-1">(avg {stats.avgTradesPerSecond.toFixed(0)})</span>
+              <span className="text-muted-foreground ml-1">(avg {stats.avgTradesPerSecond.toFixed(0)})</span>
             )}
           </span>
         </div>
       )}
       
       {/* Header row */}
-      <div className="flex bg-gray-800/50 border-b border-gray-700 text-[10px] font-medium text-gray-500 uppercase tracking-wider flex-shrink-0">
-        <div className="w-20 px-2 py-1.5 text-left">Time</div>
-        <div className="w-20 px-2 py-1.5 text-right">Price</div>
-        <div className="w-16 px-2 py-1.5 text-right">Size</div>
-        <div className="w-20 px-2 py-1.5 text-right">Amount</div>
-        <div className="w-12 px-2 py-1.5 text-center">Side</div>
+      <div className="flex bg-surface-inset border-b border-line font-sans text-[10.5px] font-medium text-muted-foreground shrink-0">
+        <div className="min-w-0 overflow-hidden flex-[1.15] px-1.5 py-1.5 text-left">Time</div>
+        <div className="min-w-0 overflow-hidden flex-1 px-1.5 py-1.5 text-right">Price</div>
+        <div className="min-w-0 overflow-hidden flex-1 px-1.5 py-1.5 text-right">Size</div>
+        <div className="hidden min-w-0 overflow-hidden flex-1 px-1.5 py-1.5 text-right @[22rem]:block">Amount</div>
+        <div className="w-[58px] shrink-0 px-1 py-1.5 text-center">Side</div>
         {showAnalytics && (
           <>
             <div className="w-20 px-2 py-1.5 text-right">VWAP</div>

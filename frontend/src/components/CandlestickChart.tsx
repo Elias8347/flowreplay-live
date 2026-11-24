@@ -295,7 +295,7 @@ export function CandlestickChart({
     return (
       <div
         ref={containerRef}
-        className={`flex items-center justify-center bg-black border border-gray-800 rounded w-full h-full ${className}`}
+        className={`flex items-center justify-center bg-black border border-gray-800 rounded-sm w-full h-full ${className}`}
         style={{ minHeight: propHeight || 200 }}
       >
         <span className="text-gray-600 font-mono text-sm animate-pulse">Waiting for candle data...</span>
@@ -306,7 +306,7 @@ export function CandlestickChart({
   return (
     <div 
       ref={containerRef} 
-      className={`bg-black rounded ${className}`}
+      className={`bg-black rounded-sm ${className}`}
       style={{ width: '100%', height: '100%', minHeight: 100 }}
     >
       <canvas

@@ -21,6 +21,7 @@ interface CatalogMarket {
   marketId: string;
   provider: string;
   symbol: string;
+  maxLeverage: number | null;
 }
 
 /** Remembers recent trade IDs using two rotating sets, so memory stays bounded. */
@@ -133,6 +134,13 @@ export class MfpAdapter extends BaseAdapter {
     return [...this.markets.values()].filter((m) => m.provider === 'binance').map((m) => m.symbol).sort();
   }
 
+  /** Maximum leverage per supported market, as listed by MFP. */
+  getLeverage(): Record<string, number> {
+    const leverage: Record<string, number> = {};
+    for (const m of this.markets.values()) if (m.provider === 'binance' && m.maxLeverage) leverage[m.symbol] = m.maxLeverage;
+    return leverage;
+  }
+
   getCoverage(): Record<string, number> {
     const coverage: Record<string, number> = {};
     for (const market of this.markets.values()) coverage[market.provider] = (coverage[market.provider] ?? 0) + 1;
@@ -150,7 +158,15 @@ export class MfpAdapter extends BaseAdapter {
     this.markets.clear();
     for (const m of list) {
       const wire = String(m.market_id).split('|')[1];
-      if (wire) this.markets.set(wire.toUpperCase(), { marketId: m.market_id, provider: m.provider, symbol: wire.toUpperCase() });
+      if (wire) {
+        const leverage = Number(m.max_leverage);
+        this.markets.set(wire.toUpperCase(), {
+          marketId: m.market_id,
+          provider: m.provider,
+          symbol: wire.toUpperCase(),
+          maxLeverage: Number.isFinite(leverage) && leverage > 0 ? leverage : null,
+        });
+      }
     }
   }
 

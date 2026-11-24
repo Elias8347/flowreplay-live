@@ -89,7 +89,7 @@ function VolumeBar({
     )}>
       {/* Price label */}
       <div className={cn(
-        "w-16 text-right text-[10px] tabular-nums flex-shrink-0",
+        "w-16 text-right text-[10px] tabular-nums shrink-0",
         isPoc ? "text-yellow-400 font-bold" : 
         isVah ? "text-[#00FF41]" :
         isVal ? "text-[#FF4545]" :
@@ -100,7 +100,7 @@ function VolumeBar({
       </div>
       
       {/* Markers */}
-      <div className="w-8 text-[8px] text-center flex-shrink-0">
+      <div className="w-8 text-[8px] text-center shrink-0">
         {isPoc && <span className="text-yellow-400">POC</span>}
         {isVah && !isPoc && <span className="text-[#00FF41]">VAH</span>}
         {isVal && !isPoc && <span className="text-[#FF4545]">VAL</span>}
@@ -109,7 +109,7 @@ function VolumeBar({
       </div>
       
       {/* Volume bar */}
-      <div className="flex-1 h-3 bg-gray-900 rounded-sm overflow-hidden relative">
+      <div className="flex-1 h-3 bg-gray-900 rounded-xs overflow-hidden relative">
         {/* Sell volume (red, left side) - use max(2%, calculated) for visibility */}
         <div 
           className="absolute left-0 h-full bg-[#FF4545]/60 transition-all duration-150"
@@ -123,7 +123,7 @@ function VolumeBar({
         {/* Total outline if POC */}
         {isPoc && (
           <div 
-            className="absolute left-0 h-full border border-yellow-400/50 rounded-sm"
+            className="absolute left-0 h-full border border-yellow-400/50 rounded-xs"
             style={{ width: `${minBarWidth}%` }}
           />
         )}
@@ -131,7 +131,7 @@ function VolumeBar({
       
       {/* Volume label */}
       <div className={cn(
-        "w-14 text-right text-[10px] tabular-nums flex-shrink-0",
+        "w-14 text-right text-[10px] tabular-nums shrink-0",
         isPoc ? "text-yellow-400" : "text-gray-600"
       )}>
         {formatVolume(level.volume)}
@@ -139,7 +139,7 @@ function VolumeBar({
       
       {/* Delta */}
       <div className={cn(
-        "w-12 text-right text-[10px] tabular-nums flex-shrink-0",
+        "w-12 text-right text-[10px] tabular-nums shrink-0",
         level.delta > 0 ? "text-[#00FF41]" : level.delta < 0 ? "text-[#FF4545]" : "text-gray-600"
       )}>
         {level.delta > 0 ? '+' : ''}{formatVolume(level.delta)}
@@ -255,12 +255,12 @@ export const VolumeProfile = memo(function VolumeProfile({
   
   return (
     <div className={cn(
-      "bg-black rounded border border-gray-800 overflow-hidden font-mono flex flex-col",
+      "bg-black rounded-sm border border-gray-800 overflow-hidden font-mono flex flex-col",
       className
     )}>
       {/* Header */}
       <div 
-        className="flex items-center justify-between p-2 border-b border-gray-800 cursor-pointer hover:bg-gray-900/50 transition-colors flex-shrink-0"
+        className="flex items-center justify-between p-2 border-b border-gray-800 cursor-pointer hover:bg-gray-900/50 transition-colors shrink-0"
         onClick={() => setIsExpanded(!isExpanded)}
       >
         <div className="flex items-center gap-2">

@@ -1,0 +1,86 @@
+/* Generated from tokens.json. Do not edit by hand. */
+:root {
+  --fr-color-surface-app: #0c0e11;
+  --fr-color-surface-panel: #15181d;
+  --fr-color-surface-raised: #1d222a;
+  --fr-color-surface-inset: #0e1116;
+  --fr-color-surface-hover: #232933;
+  --fr-color-border-default: #2b2e32;
+  --fr-color-border-subtle: #1d2127;
+  --fr-color-border-strong: #3a3f46;
+  --fr-color-text-primary: #fafafa;
+  --fr-color-text-secondary: #c7cdd4;
+  --fr-color-text-muted: #949ca6;
+  --fr-color-text-disabled: #5f6772;
+  --fr-color-text-on-brand: #000000;
+  --fr-color-brand-default: #36cf8f;
+  --fr-color-brand-hover: #4de0a3;
+  --fr-color-brand-focus: #98ffa7;
+  --fr-color-market-buy: #36cf8f;
+  --fr-color-market-sell: #fa6f5f;
+  --fr-color-market-buy-tint: #36cf8f29;
+  --fr-color-market-sell-tint: #fa6f5f29;
+  --fr-color-market-poc: #f2a618;
+  --fr-color-market-cvd: #f2a618;
+  --fr-color-own-default: #3ca2e0;
+  --fr-color-own-tint: #3ca2e029;
+  --fr-color-risk-floor: #fa6f5f;
+  --fr-color-risk-warning: #f2a618;
+  --fr-color-risk-error: #fb2c36;
+  --fr-color-quality-live: #36cf8f;
+  --fr-color-quality-rebuilt: #3ca2e0;
+  --fr-color-quality-partial: #f2a618;
+  --fr-color-quality-sample: #f2a618;
+  --fr-color-quality-none: #949ca6;
+  --fr-color-chart-grid: #1d2127;
+  --fr-color-chart-crosshair: #949ca6;
+  --fr-color-chart-last-price: #36cf8f;
+  --fr-color-chart-volume-opacity: 0.4;
+  --fr-color-footprint-fill-min: 0.08;
+  --fr-color-footprint-fill-max: 0.42;
+  --fr-color-footprint-text: #eef2f5;
+  --fr-color-footprint-imbalance-ratio: 3;
+  --fr-font-family-sans: "Geist", "Geist Variable", system-ui, sans-serif;
+  --fr-font-family-mono: "Geist Mono", "Geist Mono Variable", ui-monospace, monospace;
+  --fr-font-size-2xs: 10.5px;
+  --fr-font-size-xs: 11px;
+  --fr-font-size-sm: 12px;
+  --fr-font-size-md: 13px;
+  --fr-font-size-lg: 14px;
+  --fr-font-size-xl: 16px;
+  --fr-font-size-2xl: 20px;
+  --fr-font-size-3xl: 28px;
+  --fr-font-weight-regular: 400;
+  --fr-font-weight-medium: 500;
+  --fr-font-weight-semibold: 600;
+  --fr-font-weight-bold: 700;
+  --fr-space-1: 4px;
+  --fr-space-2: 8px;
+  --fr-space-3: 12px;
+  --fr-space-4: 16px;
+  --fr-space-5: 20px;
+  --fr-space-6: 24px;
+  --fr-radius-sm: 6px;
+  --fr-radius-control: 8px;
+  --fr-radius-panel: 10px;
+  --fr-radius-pill: 999px;
+  --fr-size-top-bar: 52px;
+  --fr-size-market-header: 48px;
+  --fr-size-toolbar: 36px;
+  --fr-size-status-bar: 28px;
+  --fr-size-control: 32px;
+  --fr-size-control-compact: 28px;
+  --fr-size-row-dense: 22px;
+  --fr-size-row: 28px;
+  --fr-size-panel-header: 36px;
+  --fr-motion-fast: 120ms;
+  --fr-motion-base: 200ms;
+  --fr-motion-easing: cubic-bezier(0.2, 0, 0, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --fr-motion-fast: 0ms;
+    --fr-motion-base: 0ms;
+  }
+}
